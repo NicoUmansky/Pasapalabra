@@ -37,6 +37,14 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
     interimResults: true,
     onResult: (result) => {
       console.log("Speech result:", result)
+      
+      // Si se detectó "pasapalabra", ejecutar esa acción
+      if (result.isPasapalabra) {
+        console.log("Pasapalabra detectado por voz")
+        onPassapalabra()
+        return
+      }
+      
       if (result.isFinal && result.transcript.trim()) {
         setInputValue(result.transcript.trim())
         handleSubmit(result.transcript.trim())
@@ -44,6 +52,16 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
     },
     onError: (error) => {
       console.error("Speech recognition error:", error)
+      
+      // Mostrar error al usuario de manera amigable
+      if (error.includes('Permiso de micrófono')) {
+        alert("🔇 Error de micrófono: " + error + "\n\nPara solucionarlo:\n1. Toca el ícono del micrófono\n2. Permite el acceso al micrófono\n3. Recarga la página si es necesario")
+      } else if (error.includes('No se detectó voz')) {
+        // No mostrar alerta para este error, es muy común
+        console.log("No se detectó voz, continuando...")
+      } else {
+        alert("⚠️ Error de reconocimiento de voz: " + error)
+      }
     },
   })
 
@@ -53,6 +71,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
     }
   }, [transcript])
 
+  // Efecto para limpiar cuando cambie la pregunta
   useEffect(() => {
     setInputValue("")
     setShowCorrectAnswer(false)
@@ -61,7 +80,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
     if (isListening) {
       stopListening()
     }
-  }, [question, resetTranscript, isListening, stopListening])
+  }, [question.id, resetTranscript, isListening, stopListening])
 
   const normalizeText = (text: string) => {
     return text
@@ -219,10 +238,11 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
                 }}
                 className="flex-1 text-xs sm:text-sm lg:text-base py-2 sm:py-3 min-w-0"
                 style={{
-                  wordBreak: "normal",
-                  overflowWrap: "anywhere",
-                  whiteSpace: "nowrap",
-                  textOverflow: "ellipsis",
+                  wordBreak: "break-word",
+                  overflowWrap: "break-word",
+                  whiteSpace: "normal",
+                  minHeight: "auto",
+                  resize: "none"
                 }}
               />
 
@@ -244,11 +264,14 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
             </div>
 
             {isListening && (
-              <div className="text-center">
+              <div className="text-center space-y-2">
                 <Badge variant="outline" className="animate-pulse text-xs sm:text-sm">
                   <Volume2 className="h-3 w-3 mr-1" />
                   Escuchando...
                 </Badge>
+                <div className="text-xs text-gray-500">
+                  💡 Di "pasapalabra" para saltar la pregunta
+                </div>
               </div>
             )}
 

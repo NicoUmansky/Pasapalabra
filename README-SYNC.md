@@ -39,13 +39,18 @@ Este sistema permite descargar las preguntas desde Supabase una sola vez y mante
 
 1. **Configurar variables de entorno**:
    ```bash
+   # Crear archivo .env.local con:
    NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
    NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima
    ```
 
 2. **Ejecutar script de sincronización**:
    ```bash
-   node scripts/sync-questions.js
+   # Sincronización única (no sobrescribe archivo existente)
+   npm run sync-questions
+   
+   # Sincronización forzada (sobrescribe archivo existente)
+   npm run sync-from-supabase
    ```
 
 3. **Verificar archivo creado**:
@@ -64,6 +69,13 @@ Este sistema permite descargar las preguntas desde Supabase una sola vez y mante
 2. **Editar, agregar o eliminar** preguntas
 3. **Los cambios se guardan** tanto en Supabase como en el archivo local
 4. **El juego usa inmediatamente** las preguntas actualizadas
+
+### Actualizar desde Supabase
+
+1. **Botón "Actualizar"** en el panel de administrador
+2. **Recarga automática** de preguntas desde el archivo local
+3. **Sincronización manual** con `npm run sync-from-supabase`
+4. **Verificación** de que las preguntas estén actualizadas
 
 ## Flujo de Datos
 

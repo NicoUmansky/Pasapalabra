@@ -6,6 +6,7 @@ interface SpeechRecognitionResult {
   transcript: string
   confidence: number
   isFinal: boolean
+  isPasapalabra?: boolean
 }
 
 interface UseSpeechRecognitionProps {
@@ -51,6 +52,16 @@ export function useSpeechRecognition({
         recognitionInstance.interimResults = interimResults
         recognitionInstance.lang = language
         recognitionInstance.maxAlternatives = 1
+        
+        // Configuraciones adicionales para mejor compatibilidad móvil
+        recognitionInstance.grammars = null
+        recognitionInstance.serviceURI = null
+        
+        // Configuraciones específicas para móviles
+        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          recognitionInstance.continuous = false // Mejor compatibilidad en móviles
+          recognitionInstance.interimResults = false // Resultados más estables en móviles
+        }
 
         recognitionInstance.onstart = () => {
           console.log("Speech recognition started")
@@ -81,11 +92,23 @@ export function useSpeechRecognition({
           const fullTranscript = finalTranscript || interimTranscript
           setTranscript(fullTranscript)
 
+          // Detectar si se dijo "pasapalabra" o similar
+          const normalizedTranscript = fullTranscript.toLowerCase().trim()
+          const pasapalabraVariants = [
+            'pasapalabra', 'pasa palabra', 'pasa la palabra', 'pasar palabra',
+            'pasapalabras', 'pasa palabras', 'pasar palabras'
+          ]
+          
+          const isPasapalabra = pasapalabraVariants.some(variant => 
+            normalizedTranscript.includes(variant)
+          )
+
           if (onResultRef.current && fullTranscript.trim()) {
             onResultRef.current({
               transcript: fullTranscript.trim(),
               confidence: event.results[event.results.length - 1]?.[0]?.confidence || 0.8,
               isFinal: event.results[event.results.length - 1]?.isFinal || false,
+              isPasapalabra: isPasapalabra
             })
           }
         }
@@ -93,8 +116,21 @@ export function useSpeechRecognition({
         recognitionInstance.onerror = (event: any) => {
           console.error("Speech recognition error:", event.error)
           setIsListening(false)
+          
+          // Manejo específico de errores móviles
+          let errorMessage = event.error
+          if (event.error === 'not-allowed') {
+            errorMessage = 'Permiso de micrófono denegado. Por favor, permite el acceso al micrófono en tu dispositivo.'
+          } else if (event.error === 'no-speech') {
+            errorMessage = 'No se detectó voz. Intenta hablar más cerca del micrófono.'
+          } else if (event.error === 'audio-capture') {
+            errorMessage = 'Error al capturar audio. Verifica que tu micrófono esté funcionando.'
+          } else if (event.error === 'network') {
+            errorMessage = 'Error de red. Verifica tu conexión a internet.'
+          }
+          
           if (onErrorRef.current) {
-            onErrorRef.current(event.error)
+            onErrorRef.current(errorMessage)
           }
         }
 
@@ -110,7 +146,15 @@ export function useSpeechRecognition({
     if (recognition && !isListening) {
       try {
         setTranscript("")
-        recognition.start()
+        
+        // En móviles, agregar un pequeño delay para mejor compatibilidad
+        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          setTimeout(() => {
+            recognition.start()
+          }, 100)
+        } else {
+          recognition.start()
+        }
       } catch (error) {
         console.error("Error starting speech recognition:", error)
         if (onErrorRef.current) {

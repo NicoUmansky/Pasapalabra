@@ -9,11 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Edit, Plus, X, Upload, Download, Check, Clock, ArrowLeft, BookOpen } from "lucide-react"
+import { Trash2, Edit, Plus, X, Upload, Download, Check, Clock, ArrowLeft, BookOpen, RefreshCw } from "lucide-react"
 import type { Question, Difficulty } from "@/lib/game-types"
-import { questionsDatabase, updateLocalQuestions, getCurrentQuestions } from "@/lib/questions-data"
+import { questionsDatabase, updateLocalQuestions, getCurrentQuestions, getQuestionsByLetter } from "@/lib/questions-data"
 import { createClient } from "@/lib/supabase/client"
-import { updateLocalQuestionsFile } from "@/lib/supabase/questions-sync"
+import { updateLocalQuestionsFile, loadQuestionsFromLocalFile } from "@/lib/supabase/questions-sync"
 
 interface PendingQuestion extends Question {
   id: string
@@ -97,10 +97,25 @@ export function AdminQuestionsManager() {
   useEffect(() => {
     const loadQuestions = async () => {
       try {
+        // Intentar cargar preguntas desde el archivo local más reciente
+        let currentQuestions = questionsDatabase
+        
+        try {
+          const localQuestions = loadQuestionsFromLocalFile()
+          if (localQuestions.length > 0) {
+            currentQuestions = localQuestions
+            console.log("Preguntas cargadas desde archivo local:", localQuestions.length)
+          } else {
+            console.log("Usando preguntas por defecto")
+          }
+        } catch (error) {
+          console.log("Error cargando archivo local, usando preguntas por defecto:", error)
+        }
+
         // Convertir el array de preguntas a objeto agrupado por letra
         const groupedQuestions: Record<string, Question[]> = {}
 
-        questionsDatabase.forEach((question) => {
+        currentQuestions.forEach((question) => {
           const letter = question.letter.toUpperCase()
           if (!groupedQuestions[letter]) {
             groupedQuestions[letter] = []
@@ -286,6 +301,33 @@ export function AdminQuestionsManager() {
     // Implement close logic here
   }
 
+  const reloadQuestions = async () => {
+    try {
+      // Recargar preguntas desde el archivo local
+      const localQuestions = loadQuestionsFromLocalFile()
+      if (localQuestions.length > 0) {
+        const groupedQuestions: Record<string, Question[]> = {}
+        
+        localQuestions.forEach((question) => {
+          const letter = question.letter.toUpperCase()
+          if (!groupedQuestions[letter]) {
+            groupedQuestions[letter] = []
+          }
+          groupedQuestions[letter].push(question)
+        })
+        
+        setQuestions(groupedQuestions)
+        console.log("Preguntas recargadas desde archivo local:", localQuestions.length)
+        alert("Preguntas actualizadas desde la base de datos")
+      } else {
+        alert("No se encontraron preguntas en el archivo local")
+      }
+    } catch (error) {
+      console.error("Error recargando preguntas:", error)
+      alert("Error al recargar las preguntas")
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
@@ -369,6 +411,10 @@ export function AdminQuestionsManager() {
               <Button variant="outline" onClick={exportQuestions} className="w-full sm:w-auto bg-transparent">
                 <Download className="w-4 h-4 mr-2" />
                 Exportar
+              </Button>
+              <Button variant="outline" onClick={reloadQuestions} className="w-full sm:w-auto bg-transparent">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Actualizar
               </Button>
             </div>
           </div>
