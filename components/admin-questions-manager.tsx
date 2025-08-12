@@ -9,9 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Edit, Plus, Save, X, Upload, Download, Check, Clock } from "lucide-react"
+import { Trash2, Edit, Plus, Save, X, Upload, Download, Check, Clock, ArrowLeft } from "lucide-react"
 import type { Question, Difficulty } from "@/lib/game-types"
-import { questionsDatabase } from "@/lib/questions-data"
+import { questionsDatabase, questionsData } from "@/lib/questions-data"
 
 interface PendingQuestion extends Question {
   id: string
@@ -104,12 +104,23 @@ export function AdminQuestionsManager() {
       return
     }
 
-    setQuestions((prev) => ({
-      ...prev,
-      [selectedLetter]: prev[selectedLetter]?.map((q) => (q === editingQuestion ? { ...editingQuestion } : q)) || [],
-    }))
+    setQuestions((prev) => {
+      const updatedQuestions = { ...prev }
+      if (updatedQuestions[selectedLetter]) {
+        updatedQuestions[selectedLetter] = updatedQuestions[selectedLetter].map((q) =>
+          q.id === editingQuestion.id ? { ...editingQuestion } : q,
+        )
+      }
+      return updatedQuestions
+    })
+
+    const questionIndex = questionsData.findIndex((q) => q.id === editingQuestion.id)
+    if (questionIndex !== -1) {
+      questionsData[questionIndex] = { ...editingQuestion }
+    }
 
     setEditingQuestion(null)
+    alert("Pregunta actualizada correctamente")
   }
 
   const deleteQuestion = (questionToDelete: Question) => {
@@ -193,20 +204,30 @@ export function AdminQuestionsManager() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-2 sm:p-4">
-      <div className="flex border-b">
-        <button
-          className={`px-4 py-2 font-medium ${activeTab === "questions" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"}`}
-          onClick={() => setActiveTab("questions")}
-        >
-          Preguntas ({Object.values(questions).flat().length})
-        </button>
-        <button
-          className={`px-4 py-2 font-medium ${activeTab === "pending" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"}`}
-          onClick={() => setActiveTab("pending")}
-        >
-          Pendientes ({pendingQuestions.length})
-        </button>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => (window.location.href = "/")} className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Volver al Menú
+          </Button>
+          <h2 className="text-2xl font-bold">Administrador de Preguntas</h2>
+        </div>
+
+        <div className="flex border-b">
+          <button
+            className={`px-4 py-2 font-medium ${activeTab === "questions" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"}`}
+            onClick={() => setActiveTab("questions")}
+          >
+            Preguntas ({Object.values(questions).flat().length})
+          </button>
+          <button
+            className={`px-4 py-2 font-medium ${activeTab === "pending" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"}`}
+            onClick={() => setActiveTab("pending")}
+          >
+            Pendientes ({pendingQuestions.length})
+          </button>
+        </div>
       </div>
 
       {activeTab === "questions" && (
@@ -422,7 +443,7 @@ export function AdminQuestionsManager() {
                           size="sm"
                           className="w-full sm:w-auto"
                         >
-                          <X className="w-4 h-4 mr-2" />
+                          <X className="w-4 h-4" />
                           Cancelar
                         </Button>
                       </div>

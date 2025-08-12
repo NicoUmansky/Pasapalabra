@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import type SpeechRecognition from "speech-recognition"
 
 interface SpeechRecognitionResult {
   transcript: string
@@ -27,11 +26,11 @@ export function useSpeechRecognition({
   const [isListening, setIsListening] = useState(false)
   const [isSupported, setIsSupported] = useState(false)
   const [transcript, setTranscript] = useState("")
-  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null)
+  const [recognition, setRecognition] = useState<any>(null)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
 
       if (SpeechRecognition) {
         setIsSupported(true)
@@ -40,16 +39,20 @@ export function useSpeechRecognition({
         recognitionInstance.continuous = continuous
         recognitionInstance.interimResults = interimResults
         recognitionInstance.lang = language
+        recognitionInstance.maxAlternatives = 1
 
         recognitionInstance.onstart = () => {
+          console.log("Speech recognition started")
           setIsListening(true)
         }
 
         recognitionInstance.onend = () => {
+          console.log("Speech recognition ended")
           setIsListening(false)
         }
 
-        recognitionInstance.onresult = (event) => {
+        recognitionInstance.onresult = (event: any) => {
+          console.log("Speech recognition result:", event)
           let finalTranscript = ""
           let interimTranscript = ""
 
@@ -67,16 +70,16 @@ export function useSpeechRecognition({
           const fullTranscript = finalTranscript || interimTranscript
           setTranscript(fullTranscript)
 
-          if (onResult) {
+          if (onResult && fullTranscript.trim()) {
             onResult({
-              transcript: fullTranscript,
-              confidence: event.results[event.results.length - 1]?.[0]?.confidence || 0,
+              transcript: fullTranscript.trim(),
+              confidence: event.results[event.results.length - 1]?.[0]?.confidence || 0.8,
               isFinal: event.results[event.results.length - 1]?.isFinal || false,
             })
           }
         }
 
-        recognitionInstance.onerror = (event) => {
+        recognitionInstance.onerror = (event: any) => {
           console.error("Speech recognition error:", event.error)
           setIsListening(false)
           if (onError) {
@@ -86,6 +89,7 @@ export function useSpeechRecognition({
 
         setRecognition(recognitionInstance)
       } else {
+        console.warn("Speech recognition not supported")
         setIsSupported(false)
       }
     }
@@ -93,14 +97,25 @@ export function useSpeechRecognition({
 
   const startListening = useCallback(() => {
     if (recognition && !isListening) {
-      setTranscript("")
-      recognition.start()
+      try {
+        setTranscript("")
+        recognition.start()
+      } catch (error) {
+        console.error("Error starting speech recognition:", error)
+        if (onError) {
+          onError("Error starting speech recognition")
+        }
+      }
     }
-  }, [recognition, isListening])
+  }, [recognition, isListening, onError])
 
   const stopListening = useCallback(() => {
     if (recognition && isListening) {
-      recognition.stop()
+      try {
+        recognition.stop()
+      } catch (error) {
+        console.error("Error stopping speech recognition:", error)
+      }
     }
   }, [recognition, isListening])
 
@@ -115,13 +130,5 @@ export function useSpeechRecognition({
     startListening,
     stopListening,
     resetTranscript,
-  }
-}
-
-// Extend Window interface for TypeScript
-declare global {
-  interface Window {
-    SpeechRecognition: typeof SpeechRecognition
-    webkitSpeechRecognition: typeof SpeechRecognition
   }
 }

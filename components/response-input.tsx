@@ -22,6 +22,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
   const [inputValue, setInputValue] = useState("")
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false)
   const [lastResult, setLastResult] = useState<"correct" | "incorrect" | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const {
     isListening,
@@ -31,12 +32,18 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
     stopListening,
     resetTranscript,
   } = useSpeechRecognition({
-    language: settings.voiceLanguage,
+    language: settings.voiceLanguage || "es-ES",
     continuous: false,
     interimResults: true,
     onResult: (result) => {
-      if (result.isFinal && result.confidence > settings.voiceSensitivity) {
-        handleSubmit(result.transcript.trim())
+      console.log("Speech result:", result)
+      if (result.isFinal && result.transcript.trim()) {
+        setInputValue(result.transcript.trim())
+        setTimeout(() => {
+          if (!isProcessing) {
+            handleSubmit(result.transcript.trim())
+          }
+        }, 1000)
       }
     },
     onError: (error) => {
@@ -45,18 +52,21 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
   })
 
   useEffect(() => {
-    if (transcript && (settings.responseMode === "voice" || settings.responseMode === "text")) {
+    if (transcript && !isProcessing) {
       setInputValue(transcript)
     }
-  }, [transcript, settings.responseMode])
+  }, [transcript, isProcessing])
 
   useEffect(() => {
-    // Reset state when question changes
     setInputValue("")
     setShowCorrectAnswer(false)
     setLastResult(null)
+    setIsProcessing(false)
     resetTranscript()
-  }, [question, resetTranscript])
+    if (isListening) {
+      stopListening()
+    }
+  }, [question, resetTranscript, isListening, stopListening])
 
   const normalizeText = (text: string) => {
     return text
@@ -64,6 +74,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "") // Remove accents
       .replace(/[^\w\s]/g, "") // Remove punctuation
+      .replace(/\s+/g, " ") // Normalize spaces
       .trim()
   }
 
@@ -71,32 +82,49 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
     const normalizedUser = normalizeText(userAnswer)
     const normalizedCorrect = normalizeText(question.answer)
 
+    console.log("Checking answer:", { userAnswer, normalizedUser, normalizedCorrect })
+
     // Check exact match
     if (normalizedUser === normalizedCorrect) {
       return true
     }
 
-    // Check if user answer contains the correct answer or vice versa
-    const similarity = normalizedUser.includes(normalizedCorrect) || normalizedCorrect.includes(normalizedUser)
+    // Check if user answer contains the correct answer or vice versa (for partial matches)
+    const userWords = normalizedUser.split(" ")
+    const correctWords = normalizedCorrect.split(" ")
 
-    return similarity
+    // Check if all words from correct answer are in user answer
+    const allWordsMatch = correctWords.every((word) =>
+      userWords.some((userWord) => userWord.includes(word) || word.includes(userWord)),
+    )
+
+    return allWordsMatch
   }
 
-  const handleSubmit = (answer?: string) => {
+  const handleSubmit = async (answer?: string) => {
+    if (isProcessing) return
+
     const finalAnswer = answer || inputValue
     if (!finalAnswer.trim()) return
+
+    setIsProcessing(true)
+
+    if (isListening) {
+      stopListening()
+    }
 
     const isCorrect = checkAnswer(finalAnswer)
     setLastResult(isCorrect ? "correct" : "incorrect")
 
     if (!isCorrect && settings.showCorrectAnswer) {
       setShowCorrectAnswer(true)
-      // Auto-advance after showing correct answer
       setTimeout(() => {
         onAnswer(false)
       }, 3000)
     } else {
-      onAnswer(isCorrect)
+      setTimeout(() => {
+        onAnswer(isCorrect)
+      }, 1000)
     }
   }
 
@@ -104,29 +132,44 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
     if (isListening) {
       stopListening()
     } else {
+      resetTranscript()
+      setInputValue("")
       startListening()
     }
   }
 
   if (settings.responseMode === "visible") {
     return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardContent className="p-4 sm:p-6">
-          <div className="space-y-4">
+      <Card className="w-full max-w-sm sm:max-w-md mx-auto">
+        <CardContent className="p-3 sm:p-6">
+          <div className="space-y-3 sm:space-y-4">
             <div className="text-center">
-              <p className="text-base sm:text-lg font-medium mb-4">{question.question}</p>
-              <div className="p-3 sm:p-4 bg-muted rounded-lg">
-                <p className="text-lg sm:text-xl font-bold text-primary">{question.answer}</p>
+              <p className="text-sm sm:text-base lg:text-lg font-medium mb-3 sm:mb-4 leading-tight">
+                {question.question}
+              </p>
+              <div className="p-2 sm:p-3 lg:p-4 bg-muted rounded-lg">
+                <p className="text-base sm:text-lg lg:text-xl font-bold text-primary">{question.answer}</p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 justify-center">
-              <Button onClick={() => onAnswer(true)} className="bg-green-500 hover:bg-green-600 text-sm sm:text-base">
+            <div className="flex flex-col gap-2 justify-center">
+              <Button
+                onClick={() => onAnswer(true)}
+                className="bg-green-500 hover:bg-green-600 text-xs sm:text-sm lg:text-base py-2 sm:py-3"
+              >
                 Correcto
               </Button>
-              <Button onClick={() => onAnswer(false)} variant="destructive" className="text-sm sm:text-base">
+              <Button
+                onClick={() => onAnswer(false)}
+                variant="destructive"
+                className="text-xs sm:text-sm lg:text-base py-2 sm:py-3"
+              >
                 Incorrecto
               </Button>
-              <Button onClick={onPassapalabra} variant="outline" className="text-sm sm:text-base bg-transparent">
+              <Button
+                onClick={onPassapalabra}
+                variant="outline"
+                className="text-xs sm:text-sm lg:text-base py-2 sm:py-3 bg-transparent"
+              >
                 Pasapalabra
               </Button>
             </div>
@@ -137,25 +180,29 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardContent className="p-4 sm:p-6">
-        <div className="space-y-4">
+    <Card className="w-full max-w-sm sm:max-w-md mx-auto">
+      <CardContent className="p-3 sm:p-6">
+        <div className="space-y-3 sm:space-y-4">
           <div className="text-center">
-            <p className="text-base sm:text-lg font-medium mb-4">{question.question}</p>
+            <p className="text-sm sm:text-base lg:text-lg font-medium mb-3 sm:mb-4 leading-tight">
+              {question.question}
+            </p>
           </div>
 
           {showCorrectAnswer && (
-            <div className="p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="p-2 sm:p-3 lg:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 mb-2">
                 Respuesta incorrecta. La respuesta correcta es:
               </p>
-              <p className="text-base sm:text-lg font-bold text-red-700 dark:text-red-300">{question.answer}</p>
+              <p className="text-sm sm:text-base lg:text-lg font-bold text-red-700 dark:text-red-300">
+                {question.answer}
+              </p>
             </div>
           )}
 
           {lastResult && !showCorrectAnswer && (
             <div
-              className={`p-3 rounded-lg text-center ${
+              className={`p-2 sm:p-3 rounded-lg text-center ${
                 lastResult === "correct"
                   ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
                   : "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
@@ -167,19 +214,19 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
             </div>
           )}
 
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex gap-2">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Escribe tu respuesta..."
-                disabled={disabled || showCorrectAnswer}
+                disabled={disabled || showCorrectAnswer || isProcessing}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !disabled && !showCorrectAnswer) {
+                  if (e.key === "Enter" && !disabled && !showCorrectAnswer && !isProcessing) {
                     handleSubmit()
                   }
                 }}
-                className="flex-1 text-sm sm:text-base"
+                className="flex-1 text-xs sm:text-sm lg:text-base py-2 sm:py-3"
               />
 
               {speechSupported && (
@@ -187,10 +234,14 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
                   onClick={handleVoiceToggle}
                   variant={isListening ? "destructive" : "outline"}
                   size="icon"
-                  disabled={disabled || showCorrectAnswer}
-                  className="shrink-0"
+                  disabled={disabled || showCorrectAnswer || isProcessing}
+                  className="shrink-0 h-9 w-9 sm:h-10 sm:w-10"
                 >
-                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  {isListening ? (
+                    <MicOff className="h-3 w-3 sm:h-4 sm:w-4" />
+                  ) : (
+                    <Mic className="h-3 w-3 sm:h-4 sm:w-4" />
+                  )}
                 </Button>
               )}
             </div>
@@ -204,19 +255,19 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+            <div className="flex flex-col gap-2 justify-center">
               <Button
                 onClick={() => handleSubmit()}
-                disabled={!inputValue.trim() || disabled || showCorrectAnswer}
-                className="bg-blue-500 hover:bg-blue-600 text-sm sm:text-base"
+                disabled={!inputValue.trim() || disabled || showCorrectAnswer || isProcessing}
+                className="bg-blue-500 hover:bg-blue-600 text-xs sm:text-sm lg:text-base py-2 sm:py-3"
               >
-                Responder
+                {isProcessing ? "Procesando..." : "Responder"}
               </Button>
               <Button
                 onClick={onPassapalabra}
                 variant="outline"
-                disabled={disabled || showCorrectAnswer}
-                className="text-sm sm:text-base bg-transparent"
+                disabled={disabled || showCorrectAnswer || isProcessing}
+                className="text-xs sm:text-sm lg:text-base py-2 sm:py-3 bg-transparent"
               >
                 Pasapalabra
               </Button>

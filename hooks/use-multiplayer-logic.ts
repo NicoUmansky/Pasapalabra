@@ -39,37 +39,48 @@ export function useMultiplayerLogic() {
   } | null>(null)
 
   const [playerLetters, setPlayerLetters] = useState<Record<string, LetterState[]>>({})
+  const [playerTimers, setPlayerTimers] = useState<Record<string, number>>({})
+  const [playerCurrentLetters, setPlayerCurrentLetters] = useState<Record<string, string>>({})
 
-  const initializePlayers = useCallback((playerCount: number, playerNames?: string[]) => {
-    const players: Player[] = Array.from({ length: playerCount }, (_, index) => ({
-      id: `player-${index + 1}`,
-      name: playerNames?.[index] || `Jugador ${index + 1}`,
-      score: {
-        correct: 0,
-        incorrect: 0,
-        skipped: 0,
-      },
-      isActive: index === 0,
-    }))
-
-    // Crear letras individuales para cada jugador
-    const letters: Record<string, LetterState[]> = {}
-    players.forEach((player) => {
-      letters[player.id] = getAllLetters().map((letter) => ({
-        letter,
-        status: "pending",
+  const initializePlayers = useCallback(
+    (playerCount: number, playerNames?: string[]) => {
+      const players: Player[] = Array.from({ length: playerCount }, (_, index) => ({
+        id: `player-${index + 1}`,
+        name: playerNames?.[index] || `Jugador ${index + 1}`,
+        score: {
+          correct: 0,
+          incorrect: 0,
+          skipped: 0,
+        },
+        isActive: index === 0,
       }))
-    })
 
-    setGameState((prev) => ({
-      ...prev,
-      players,
-      currentPlayerIndex: 0,
-    }))
+      const letters: Record<string, LetterState[]> = {}
+      const timers: Record<string, number> = {}
+      const currentLetters: Record<string, string> = {}
 
-    setPlayerLetters(letters)
-    return { players, letters }
-  }, [])
+      players.forEach((player) => {
+        letters[player.id] = getAllLetters().map((letter) => ({
+          letter,
+          status: "pending",
+        }))
+        timers[player.id] = gameState.settings.duration
+        currentLetters[player.id] = "A"
+      })
+
+      setGameState((prev) => ({
+        ...prev,
+        players,
+        currentPlayerIndex: 0,
+      }))
+
+      setPlayerLetters(letters)
+      setPlayerTimers(timers)
+      setPlayerCurrentLetters(currentLetters)
+      return { players, letters }
+    },
+    [gameState.settings.duration],
+  )
 
   const getCurrentPlayer = useCallback(() => {
     return gameState.players[gameState.currentPlayerIndex]
@@ -84,14 +95,12 @@ export function useMultiplayerLogic() {
   const findNextPendingLetter = useCallback((letters: LetterState[], currentLetter: string): string | null => {
     const currentIndex = letters.findIndex((l) => l.letter === currentLetter)
 
-    // Buscar desde la letra actual hacia adelante
     for (let i = currentIndex + 1; i < letters.length; i++) {
       if (letters[i].status === "pending") {
         return letters[i].letter
       }
     }
 
-    // Si no encuentra, buscar desde el principio hasta la letra actual
     for (let i = 0; i < currentIndex; i++) {
       if (letters[i].status === "pending") {
         return letters[i].letter
@@ -123,38 +132,27 @@ export function useMultiplayerLogic() {
         isActive: index === nextPlayerIndex,
       }))
 
-      const isNewRound = nextPlayerIndex === 0
-      const newRoundsCompleted = isNewRound ? prev.roundsCompleted + 1 : prev.roundsCompleted
-
       return {
         ...prev,
         currentPlayerIndex: nextPlayerIndex,
         players: updatedPlayers,
-        roundsCompleted: newRoundsCompleted,
-        timeRemaining: getTimePerPlayer(), // Reset time for new player
       }
     })
 
-    // Load question for next player
     setTimeout(() => {
       const nextPlayer = gameState.players[(gameState.currentPlayerIndex + 1) % gameState.players.length]
       if (nextPlayer) {
-        const playerLettersForNext = playerLetters[nextPlayer.id] || []
-        const nextLetter = findNextPendingLetter(playerLettersForNext, "A")
-        if (nextLetter) {
-          setGameState((prev) => ({ ...prev, currentLetter: nextLetter }))
-          loadQuestionForPlayer(nextPlayer.id, nextLetter, gameState.settings.difficulty)
-        }
+        const nextPlayerCurrentLetter = playerCurrentLetters[nextPlayer.id] || "A"
+        setGameState((prev) => ({ ...prev, currentLetter: nextPlayerCurrentLetter }))
+        loadQuestionForPlayer(nextPlayer.id, nextPlayerCurrentLetter, gameState.settings.difficulty)
       }
     }, 1000)
   }, [
     gameState.players,
     gameState.currentPlayerIndex,
-    playerLetters,
-    findNextPendingLetter,
+    playerCurrentLetters,
     loadQuestionForPlayer,
     gameState.settings.difficulty,
-    getTimePerPlayer,
   ])
 
   const startGame = useCallback(
@@ -167,7 +165,7 @@ export function useMultiplayerLogic() {
         isPlaying: true,
         isPaused: false,
         currentLetter: "A",
-        timeRemaining: getTimePerPlayer(),
+        timeRemaining: prev.settings.duration,
         players,
         currentPlayerIndex: 0,
         roundsCompleted: 0,
@@ -181,18 +179,11 @@ export function useMultiplayerLogic() {
 
       setPlayerLetters(letters)
 
-      // Load first question for first player
       if (players.length > 0) {
         loadQuestionForPlayer(players[0].id, "A", gameState.settings.difficulty)
       }
     },
-    [
-      gameState.settings.playerCount,
-      gameState.settings.difficulty,
-      initializePlayers,
-      getTimePerPlayer,
-      loadQuestionForPlayer,
-    ],
+    [gameState.settings.playerCount, gameState.settings.difficulty, initializePlayers, loadQuestionForPlayer],
   )
 
   const handleResponse = useCallback(
@@ -202,9 +193,8 @@ export function useMultiplayerLogic() {
       const currentPlayer = getCurrentPlayer()
       if (!currentPlayer) return
 
-      const currentLetter = gameState.currentLetter
+      const currentLetter = playerCurrentLetters[currentPlayer.id] || gameState.currentLetter
 
-      // Update player letters
       setPlayerLetters((prev) => ({
         ...prev,
         [currentPlayer.id]: prev[currentPlayer.id].map((l) =>
@@ -219,7 +209,6 @@ export function useMultiplayerLogic() {
         ),
       }))
 
-      // Update player score
       setGameState((prev) => ({
         ...prev,
         players: prev.players.map((player) =>
@@ -245,11 +234,10 @@ export function useMultiplayerLogic() {
       if (response === "skip" || response === "incorrect") {
         setTimeout(() => {
           switchToNextPlayer()
-        }, 1500) // Dar tiempo para mostrar la respuesta correcta
+        }, 1500)
         return
       }
 
-      // Si la respuesta es correcta, continuar con la siguiente letra del mismo jugador
       setTimeout(() => {
         const currentPlayerLetters = playerLetters[currentPlayer.id] || []
         const updatedPlayerLetters = currentPlayerLetters.map((l) =>
@@ -264,11 +252,13 @@ export function useMultiplayerLogic() {
         const nextLetter = findNextPendingLetter(updatedPlayerLetters, currentLetter)
 
         if (nextLetter) {
-          // Continue with same player
+          setPlayerCurrentLetters((prev) => ({
+            ...prev,
+            [currentPlayer.id]: nextLetter,
+          }))
           setGameState((prev) => ({ ...prev, currentLetter: nextLetter }))
           loadQuestionForPlayer(currentPlayer.id, nextLetter, gameState.settings.difficulty)
         } else {
-          // Player finished all letters, switch to next player or end game
           const allPlayersFinished = gameState.players.every((player) => {
             const playerLettersForCheck = playerLetters[player.id] || []
             return playerLettersForCheck.every((l) => l.status !== "pending")
@@ -287,6 +277,7 @@ export function useMultiplayerLogic() {
       gameState,
       getCurrentPlayer,
       playerLetters,
+      playerCurrentLetters,
       findNextPendingLetter,
       loadQuestionForPlayer,
       switchToNextPlayer,
@@ -321,6 +312,8 @@ export function useMultiplayerLogic() {
     }))
     setCurrentQuestion(null)
     setPlayerLetters({})
+    setPlayerTimers({})
+    setPlayerCurrentLetters({})
   }, [getTimePerPlayer])
 
   const updateSettings = useCallback((newSettings: GameSettings) => {
@@ -331,23 +324,32 @@ export function useMultiplayerLogic() {
     }))
   }, [])
 
-  // Timer effect
   useEffect(() => {
-    if (gameState.isPlaying && !gameState.isPaused && gameState.timeRemaining > 0) {
-      const timer = setInterval(() => {
-        setGameState((prev) => {
-          if (prev.timeRemaining <= 1) {
-            // Time up for current player, switch to next
-            setTimeout(() => switchToNextPlayer(), 100)
-            return { ...prev, timeRemaining: 0 }
-          }
-          return { ...prev, timeRemaining: prev.timeRemaining - 1 }
-        })
-      }, 1000)
+    if (gameState.isPlaying && !gameState.isPaused) {
+      const currentPlayer = getCurrentPlayer()
+      if (currentPlayer && playerTimers[currentPlayer.id] > 0) {
+        const timer = setInterval(() => {
+          setPlayerTimers((prev) => {
+            const newTime = prev[currentPlayer.id] - 1
+            if (newTime <= 0) {
+              setTimeout(() => switchToNextPlayer(), 100)
+              return { ...prev, [currentPlayer.id]: 0 }
+            }
+            return { ...prev, [currentPlayer.id]: newTime }
+          })
+        }, 1000)
 
-      return () => clearInterval(timer)
+        return () => clearInterval(timer)
+      }
     }
-  }, [gameState.isPlaying, gameState.isPaused, gameState.timeRemaining, switchToNextPlayer])
+  }, [
+    gameState.isPlaying,
+    gameState.isPaused,
+    gameState.currentPlayerIndex,
+    playerTimers,
+    getCurrentPlayer,
+    switchToNextPlayer,
+  ])
 
   const getGameStats = useCallback(() => {
     const playerStats = gameState.players.map((player) => {
@@ -371,6 +373,8 @@ export function useMultiplayerLogic() {
     gameState,
     currentQuestion,
     playerLetters,
+    playerTimers,
+    playerCurrentLetters,
     startGame,
     handleResponse,
     togglePause,

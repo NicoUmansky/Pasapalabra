@@ -747,8 +747,8 @@ export const questionsDatabase: Question[] = [
   {
     id: "l7",
     letter: "L",
-    question: "Palabra real que empieza con L",
-    answer: "Lpalabra",
+    question: "Estructura de caminos complicados diseñada para confundir",
+    answer: "Laberinto",
     difficulty: "medio",
     category: "general",
   },
@@ -1578,6 +1578,8 @@ export const questionsDatabase: Question[] = [
   },
 ]
 
+export const questionsData = questionsDatabase
+
 export const getCustomQuestions = (): Question[] => {
   if (typeof window === "undefined") return []
 
@@ -1591,9 +1593,21 @@ export const getCustomQuestions = (): Question[] => {
 }
 
 export const getQuestionsByLetter = (letter: string, difficulty?: string): Question[] => {
-  const defaultQuestions = questionsDatabase.filter(
-    (q) => q.letter === letter.toUpperCase() && (difficulty ? q.difficulty === difficulty : true),
-  )
+  const defaultQuestions = questionsDatabase
+    .filter((q) => q.letter === letter.toUpperCase() && (difficulty ? q.difficulty === difficulty : true))
+    .map((q) => {
+      // Reemplazar la pregunta problemática
+      if (q.id === "l7" && q.answer === "Lpalabra") {
+        return {
+          ...q,
+          question: "Estructura de caminos complicados diseñada para confundir",
+          answer: "Laberinto",
+          difficulty: "medio",
+          category: "general",
+        }
+      }
+      return q
+    })
 
   const customQuestions = getCustomQuestions().filter(
     (q) => q.letter === letter.toUpperCase() && (difficulty ? q.difficulty === difficulty : true),

@@ -11,15 +11,10 @@ interface RoscoWheelProps {
 }
 
 export function RoscoWheel({ letters, currentLetter, onLetterClick, isPlaying }: RoscoWheelProps) {
-  const radius = 180
-  const centerX = 250
-  const centerY = 250
-  const letterRadius = 25
-
   const getLetterPosition = (index: number, total: number) => {
     const angle = (index * 2 * Math.PI) / total - Math.PI / 2
-    const x = centerX + radius * Math.cos(angle)
-    const y = centerY + radius * Math.sin(angle)
+    const x = 50 + 35 * Math.cos(angle) // Centrado en viewBox 100x100
+    const y = 50 + 35 * Math.sin(angle)
     return { x, y }
   }
 
@@ -44,16 +39,20 @@ export function RoscoWheel({ letters, currentLetter, onLetterClick, isPlaying }:
   }
 
   return (
-    <div className="flex justify-center">
-      <svg width="500" height="500" className="drop-shadow-lg">
+    <div className="flex justify-center w-full">
+      <svg
+        viewBox="0 0 100 100"
+        className="w-full h-full max-w-[300px] max-h-[300px] sm:max-w-[400px] sm:max-h-[400px] lg:max-w-[500px] lg:max-h-[500px] drop-shadow-lg"
+        style={{ aspectRatio: "1/1" }}
+      >
         {/* Centro del rosco */}
-        <circle cx={centerX} cy={centerY} r="60" fill="#8B5CF6" className="drop-shadow-md" />
+        <circle cx="50" cy="50" r="8" fill="#8B5CF6" className="drop-shadow-md" />
         <text
-          x={centerX}
-          y={centerY}
+          x="50"
+          y="50"
           textAnchor="middle"
           dominantBaseline="middle"
-          className="fill-white text-2xl font-bold"
+          className="fill-white text-[4px] sm:text-[3px] font-bold"
         >
           🎯
         </text>
@@ -70,7 +69,7 @@ export function RoscoWheel({ letters, currentLetter, onLetterClick, isPlaying }:
               <circle
                 cx={x}
                 cy={y}
-                r={letterRadius}
+                r="5.5"
                 fill={color}
                 className={cn("drop-shadow-md transition-all duration-300", {
                   "animate-pulse": isCurrent && isPlaying,
@@ -84,7 +83,7 @@ export function RoscoWheel({ letters, currentLetter, onLetterClick, isPlaying }:
                 y={y}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className={cn("fill-white text-lg font-bold pointer-events-none", {
+                className={cn("fill-white text-[3.5px] font-bold pointer-events-none", {
                   "animate-pulse": isCurrent && isPlaying,
                 })}
               >
