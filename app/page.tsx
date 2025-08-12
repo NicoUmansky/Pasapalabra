@@ -177,11 +177,11 @@ export default function PasapalabraGame() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-8">
           {/* Rosco */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-              <h2 className="text-2xl font-semibold text-center mb-6 dark:text-gray-100">Rosco</h2>
+          <div className="xl:col-span-2 order-1">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 sm:mb-6 dark:text-gray-100">Rosco</h2>
               <RoscoWheel
                 letters={gameState.letters}
                 currentLetter={gameState.currentLetter}
@@ -192,18 +192,19 @@ export default function PasapalabraGame() {
           </div>
 
           {/* Panel de Control */}
-          <div className="space-y-6">
-            {/* Progreso del Juego */}
+          <div className="space-y-4 lg:space-y-6 order-2 xl:order-3">
             {gameState.isPlaying && (
-              <GameProgress
-                totalLetters={26}
-                completedLetters={completedLetters}
-                currentLetter={gameState.currentLetter}
-              />
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 sm:p-4">
+                <GameProgress
+                  totalLetters={26}
+                  completedLetters={completedLetters}
+                  currentLetter={gameState.currentLetter}
+                />
+              </div>
             )}
 
             {/* Estado del Juego */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
               {!gameState.isPlaying ? (
                 <div>
                   <div className="flex items-center gap-2 mb-4">
@@ -239,24 +240,26 @@ export default function PasapalabraGame() {
                     </div>
                   ) : (
                     <>
-                      <QuestionPanel
-                        question={currentQuestion?.question || ""}
-                        letter={gameState.currentLetter}
-                        isPlaying={gameState.isPlaying}
-                        currentQuestion={
-                          currentQuestion
-                            ? {
-                                question: currentQuestion.question,
-                                answer: currentQuestion.answer,
-                                difficulty: gameState.settings.difficulty,
-                              }
-                            : undefined
-                        }
-                        onAnswer={handleAdvancedResponse}
-                        onPassapalabra={handlePassapalabra}
-                      />
+                      <div className="mb-4">
+                        <QuestionPanel
+                          question={currentQuestion?.question || ""}
+                          letter={gameState.currentLetter}
+                          isPlaying={gameState.isPlaying}
+                          currentQuestion={
+                            currentQuestion
+                              ? {
+                                  question: currentQuestion.question,
+                                  answer: currentQuestion.answer,
+                                  difficulty: gameState.settings.difficulty,
+                                }
+                              : undefined
+                          }
+                          onAnswer={handleAdvancedResponse}
+                          onPassapalabra={handlePassapalabra}
+                        />
+                      </div>
                       {extendedSettings.responseMode === "buttons" && (
-                        <div className="mt-6">
+                        <div className="mt-4">
                           <ResponseButtons onResponse={handleResponse} />
                         </div>
                       )}
@@ -272,7 +275,9 @@ export default function PasapalabraGame() {
             </div>
 
             {/* Estadísticas */}
-            <GameStats score={gameState.score} />
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 sm:p-4">
+              <GameStats score={gameState.score} />
+            </div>
           </div>
         </div>
 
