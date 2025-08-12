@@ -5,6 +5,8 @@ export type ResponseMode = "buttons" | "visible" | "input" | "voice"
 
 export type Difficulty = GameDifficulty
 export interface Question {
+  id: string
+  letter: string
   question: string
   answer: string
   difficulty: Difficulty

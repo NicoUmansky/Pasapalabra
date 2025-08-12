@@ -11,8 +11,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Trash2, Edit, Plus, X, Upload, Download, Check, Clock, ArrowLeft, BookOpen } from "lucide-react"
 import type { Question, Difficulty } from "@/lib/game-types"
-import { questionsDatabase } from "@/lib/questions-data"
+import { questionsDatabase, updateLocalQuestions, getCurrentQuestions } from "@/lib/questions-data"
 import { createClient } from "@/lib/supabase/client"
+import { updateLocalQuestionsFile } from "@/lib/supabase/questions-sync"
 
 interface PendingQuestion extends Question {
   id: string
@@ -55,13 +56,17 @@ export function AdminQuestionsManager() {
 
   const saveToSupabase = async (questionsData: Record<string, Question[]>) => {
     try {
+      const questionsArray = Object.values(questionsData).flat()
+      
+      // Actualizar el archivo local primero
+      updateLocalQuestionsFile(questionsArray)
+      
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.warn("Supabase no configurado, guardando solo en localStorage")
+        console.warn("Supabase no configurado, guardando solo en archivo local")
         return true
       }
 
       const supabase = createClient()
-      const questionsArray = Object.values(questionsData).flat()
 
       // Eliminar todas las preguntas existentes
       await supabase.from("questions").delete().neq("id", "")
@@ -179,9 +184,9 @@ export function AdminQuestionsManager() {
     }
   }
 
-  const validateQuestion = (question: Partial<Question>): string | null => {
-    if (!question.question?.trim()) return "La pregunta es requerida"
-    if (!question.answer?.trim()) return "La respuesta es requerida"
+  const validateQuestion = (question: Question | null): string | null => {
+    if (!question?.question?.trim()) return "La pregunta es requerida"
+    if (!question?.answer?.trim()) return "La respuesta es requerida"
 
     // Validar que la respuesta empiece con la letra correcta
     const firstLetter = question.answer.trim().charAt(0).toUpperCase()
@@ -193,6 +198,8 @@ export function AdminQuestionsManager() {
   }
 
   const saveQuestion = async () => {
+    if (!editingQuestion) return
+    
     const validation = validateQuestion(editingQuestion)
     if (validation) {
       alert(validation)
@@ -200,10 +207,10 @@ export function AdminQuestionsManager() {
     }
 
     const questionToSave: Question = {
-      question: editingQuestion?.question!.trim(),
-      answer: editingQuestion?.answer!.trim(),
-      difficulty: editingQuestion?.difficulty as Difficulty,
-      category: editingQuestion?.category || "general",
+      question: editingQuestion.question.trim(),
+      answer: editingQuestion.answer.trim(),
+      difficulty: editingQuestion.difficulty,
+      category: editingQuestion.category || "general",
       letter: selectedLetter,
       id: Date.now().toString(),
     }
@@ -323,7 +330,7 @@ export function AdminQuestionsManager() {
                 className="w-full sm:w-64"
               />
 
-              <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+              <Select value={selectedDifficulty} onValueChange={(value: Difficulty | "all") => setSelectedDifficulty(value)}>
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>

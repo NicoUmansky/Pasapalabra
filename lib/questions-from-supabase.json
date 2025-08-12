@@ -1,0 +1,82 @@
+[
+  {
+    "id": "a1",
+    "letter": "A",
+    "question": "Conjunto de partículas minerales en la playa",
+    "answer": "Arena",
+    "difficulty": "facil",
+    "category": "naturaleza"
+  },
+  {
+    "id": "a2",
+    "letter": "A",
+    "question": "Animal que vuela y tiene plumas",
+    "answer": "Ave",
+    "difficulty": "facil",
+    "category": "animales"
+  },
+  {
+    "id": "a3",
+    "letter": "A",
+    "question": "Líquido transparente e incoloro esencial para la vida",
+    "answer": "Agua",
+    "difficulty": "facil",
+    "category": "naturaleza"
+  },
+  {
+    "id": "b1",
+    "letter": "B",
+    "question": "Sitio poblado de árboles y matas",
+    "answer": "Bosque",
+    "difficulty": "facil",
+    "category": "naturaleza"
+  },
+  {
+    "id": "b2",
+    "letter": "B",
+    "question": "Deporte que se juega con una pelota y dos aros elevados",
+    "answer": "Baloncesto",
+    "difficulty": "facil",
+    "category": "deportes"
+  },
+  {
+    "id": "c1",
+    "letter": "C",
+    "question": "Bebida fermentada de cebada",
+    "answer": "Cerveza",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "c2",
+    "letter": "C",
+    "question": "Bebida caliente hecha con granos tostados",
+    "answer": "Café",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "d1",
+    "letter": "D",
+    "question": "Territorio arenoso o pedregoso con escasa vegetación",
+    "answer": "Desierto",
+    "difficulty": "facil",
+    "category": "geografia"
+  },
+  {
+    "id": "e1",
+    "letter": "E",
+    "question": "Ocultación de un astro por otro",
+    "answer": "Eclipse",
+    "difficulty": "facil",
+    "category": "astronomia"
+  },
+  {
+    "id": "e2",
+    "letter": "E",
+    "question": "Animal paquidermo con trompa",
+    "answer": "Elefante",
+    "difficulty": "facil",
+    "category": "animales"
+  }
+]
