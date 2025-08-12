@@ -859,42 +859,6 @@ export const questionsDatabase: Question[] = [
   },
 ]
 
-async function loadQuestionsFromSupabase(): Promise<Question[]> {
-  if (typeof window !== "undefined") {
-    try {
-      const { createClient } = await import("./supabase/client")
-      const supabase = createClient()
-
-      const { data, error } = await supabase.from("questions").select("*").order("letter", { ascending: true })
-
-      if (error) {
-        console.error("Error cargando desde Supabase:", error)
-        return loadQuestionsFromStorage()
-      }
-
-      if (data && data.length > 0) {
-        // Convertir datos de Supabase al formato esperado
-        const supabaseQuestions = data.map((item) => ({
-          id: item.game_id || `${item.letter.toLowerCase()}${Math.random()}`,
-          letter: item.letter,
-          question: item.question,
-          answer: item.answer,
-          difficulty: item.difficulty,
-          category: item.category,
-        }))
-
-        // Guardar en localStorage para acceso rápido
-        localStorage.setItem("questionsArray", JSON.stringify(supabaseQuestions))
-        return supabaseQuestions
-      }
-    } catch (error) {
-      console.error("Error conectando con Supabase:", error)
-    }
-  }
-
-  return loadQuestionsFromStorage()
-}
-
 function loadQuestionsFromStorage(): Question[] {
   if (typeof window !== "undefined") {
     const saved = localStorage.getItem("questionsArray")
@@ -909,9 +873,9 @@ function loadQuestionsFromStorage(): Question[] {
   return questionsDatabase
 }
 
-export const questionsData: Record<string, Question[]> = {}
-
 const currentQuestions = loadQuestionsFromStorage()
+
+export const questionsData: Record<string, Question[]> = {}
 
 currentQuestions.forEach((question) => {
   if (!questionsData[question.letter]) {
@@ -920,11 +884,8 @@ currentQuestions.forEach((question) => {
   questionsData[question.letter].push(question)
 })
 
-export async function getRandomQuestion(
-  letter: string,
-  difficulty: "facil" | "medio" | "dificil",
-): Promise<Question | null> {
-  const updatedQuestions = await loadQuestionsFromSupabase()
+export function getRandomQuestion(letter: string, difficulty: "facil" | "medio" | "dificil"): Question | null {
+  const updatedQuestions = loadQuestionsFromStorage()
   const updatedQuestionsData: Record<string, Question[]> = {}
 
   updatedQuestions.forEach((question) => {
