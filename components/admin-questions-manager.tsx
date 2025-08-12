@@ -53,13 +53,32 @@ export function AdminQuestionsManager() {
   }
 
   useEffect(() => {
-    setQuestions(questionsDatabase)
+    const loadQuestions = () => {
+      try {
+        // Convertir el array de preguntas a objeto agrupado por letra
+        const groupedQuestions: Record<string, Question[]> = {}
 
-    // Cargar preguntas pendientes desde localStorage
-    const savedPending = localStorage.getItem("pendingQuestions")
-    if (savedPending) {
-      setPendingQuestions(JSON.parse(savedPending))
+        questionsDatabase.forEach((question) => {
+          const letter = question.letter.toUpperCase()
+          if (!groupedQuestions[letter]) {
+            groupedQuestions[letter] = []
+          }
+          groupedQuestions[letter].push(question)
+        })
+
+        setQuestions(groupedQuestions)
+
+        // Cargar preguntas pendientes desde localStorage
+        const savedPending = localStorage.getItem("pendingQuestions")
+        if (savedPending) {
+          setPendingQuestions(JSON.parse(savedPending))
+        }
+      } catch (error) {
+        console.error("Error cargando preguntas:", error)
+      }
     }
+
+    loadQuestions()
   }, [])
 
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")

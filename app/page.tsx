@@ -15,7 +15,7 @@ import { CustomQuestionsManager } from "@/components/custom-questions-manager"
 import { useGameLogic } from "@/hooks/use-game-logic"
 import { useSettings } from "@/hooks/use-settings"
 import { Button } from "@/components/ui/button"
-import { Settings, Globe, Pause, Play, Users, BookOpen, Shield } from "lucide-react"
+import { Settings, Globe, Pause, Play, Users, Shield } from "lucide-react"
 import Link from "next/link"
 
 export default function PasapalabraGame() {
@@ -109,17 +109,18 @@ export default function PasapalabraGame() {
         {/* Header */}
         <header className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">Pasapalabra</h1>
-          <div className="flex items-center justify-center gap-6 mb-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-4">
             <Timer timeRemaining={gameState.timeRemaining} />
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
               <Globe className="w-5 h-5" />
-              <span>
+              <span className="hidden sm:inline">
                 {extendedSettings.language === "es"
                   ? "Español"
                   : extendedSettings.language === "en"
                     ? "English"
                     : "Français"}
               </span>
+              <span className="sm:hidden">ES</span>
             </div>
             <Button
               variant="outline"
@@ -129,17 +130,7 @@ export default function PasapalabraGame() {
               disabled={gameState.isPlaying}
             >
               <Settings className="w-4 h-4" />
-              Configuración
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowCustomQuestions(true)}
-              className="flex items-center gap-2 bg-transparent"
-              disabled={gameState.isPlaying}
-            >
-              <BookOpen className="w-4 h-4" />
-              Mis Preguntas
+              <span className="hidden sm:inline">Configuración</span>
             </Button>
             <Link href="/admin">
               <Button
@@ -149,7 +140,7 @@ export default function PasapalabraGame() {
                 disabled={gameState.isPlaying}
               >
                 <Shield className="w-4 h-4" />
-                Admin
+                <span className="hidden sm:inline">Admin</span>
               </Button>
             </Link>
             <Link href="/multiplayer">
@@ -160,7 +151,7 @@ export default function PasapalabraGame() {
                 disabled={gameState.isPlaying}
               >
                 <Users className="w-4 h-4" />
-                Multijugador
+                <span className="hidden sm:inline">Multi</span>
               </Button>
             </Link>
             {gameState.isPlaying && (
@@ -171,15 +162,15 @@ export default function PasapalabraGame() {
                 className="flex items-center gap-2 bg-transparent"
               >
                 {gameState.isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-                {gameState.isPaused ? "Reanudar" : "Pausar"}
+                <span className="hidden sm:inline">{gameState.isPaused ? "Reanudar" : "Pausar"}</span>
               </Button>
             )}
           </div>
         </header>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
           {/* Rosco */}
-          <div className="xl:col-span-2 order-1">
+          <div className="lg:col-span-2 order-1">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 sm:mb-6 dark:text-gray-100">Rosco</h2>
               <RoscoWheel
@@ -192,7 +183,7 @@ export default function PasapalabraGame() {
           </div>
 
           {/* Panel de Control */}
-          <div className="space-y-4 lg:space-y-6 order-2 xl:order-3">
+          <div className="space-y-4 lg:space-y-6 order-2">
             {gameState.isPlaying && (
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 sm:p-4">
                 <GameProgress
@@ -311,14 +302,18 @@ export default function PasapalabraGame() {
 
         {/* Results Modal */}
         {showResults && (
-          <GameResults
-            score={gameState.score}
-            timeElapsed={gameState.settings.duration - gameState.timeRemaining}
-            totalTime={gameState.settings.duration}
-            accuracy={stats.accuracy}
-            onPlayAgain={handlePlayAgain}
-            onNewGame={handleNewGame}
-          />
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+              <GameResults
+                score={gameState.score}
+                timeElapsed={gameState.settings.duration - gameState.timeRemaining}
+                totalTime={gameState.settings.duration}
+                accuracy={stats.accuracy}
+                onPlayAgain={handlePlayAgain}
+                onNewGame={handleNewGame}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>

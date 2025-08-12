@@ -89,9 +89,11 @@ export function GameSettings({ settings, onSave, onClose, onAdvanced }: GameSett
               Modo de Respuesta
             </Label>
             <Select
-              value={localSettings.responseMode || "buttons"}
-              onValueChange={(value: "buttons" | "visible" | "text" | "voice") =>
-                setLocalSettings((prev) => ({ ...prev, responseMode: value }))
+              value={
+                localSettings.responseMode === "text" || localSettings.responseMode === "voice" ? "input" : "buttons"
+              }
+              onValueChange={(value: "buttons" | "input") =>
+                setLocalSettings((prev) => ({ ...prev, responseMode: value === "input" ? "text" : "buttons" }))
               }
             >
               <SelectTrigger className="mt-1">
@@ -99,9 +101,7 @@ export function GameSettings({ settings, onSave, onClose, onAdvanced }: GameSett
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="buttons">Botones</SelectItem>
-                <SelectItem value="visible">Visualizar Respuestas</SelectItem>
-                <SelectItem value="text">Campo de Texto</SelectItem>
-                <SelectItem value="voice">Reconocimiento de Voz</SelectItem>
+                <SelectItem value="input">Entrada (Texto/Voz)</SelectItem>
               </SelectContent>
             </Select>
           </div>
