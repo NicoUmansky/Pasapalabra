@@ -1,6 +1,6 @@
 [
   {
-    "id": "a1",
+    "id": "2a26c80b-36b8-49b3-a7b8-b753356d4e3e",
     "letter": "A",
     "question": "Conjunto de partículas minerales en la playa",
     "answer": "Arena",
@@ -8,7 +8,7 @@
     "category": "naturaleza"
   },
   {
-    "id": "a2",
+    "id": "09f3e30b-4b13-4c01-bcf5-42a21ad00afe",
     "letter": "A",
     "question": "Animal que vuela y tiene plumas",
     "answer": "Ave",
@@ -16,7 +16,23 @@
     "category": "animales"
   },
   {
-    "id": "a3",
+    "id": "22d3b054-287d-4723-80dc-9b1460087cb9",
+    "letter": "A",
+    "question": "Sustancia que combate infecciones bacterianas",
+    "answer": "Antibiótico",
+    "difficulty": "dificil",
+    "category": "medicina"
+  },
+  {
+    "id": "205e0fc6-7f15-4adf-b8dd-4e9f527cd9ea",
+    "letter": "A",
+    "question": "Estructura ubicada tanto en el cerebro como en la garganta con el tamaño de una almendra.",
+    "answer": "Amigdala",
+    "difficulty": "dificil",
+    "category": "general"
+  },
+  {
+    "id": "32cb2abc-deb8-45bf-b007-e33f41c3adf8",
     "letter": "A",
     "question": "Líquido transparente e incoloro esencial para la vida",
     "answer": "Agua",
@@ -24,7 +40,23 @@
     "category": "naturaleza"
   },
   {
-    "id": "b1",
+    "id": "23b02c0d-aecd-4daa-aeca-a25198218ef3",
+    "letter": "A",
+    "question": "Instrumento musical de cuerda pulsada",
+    "answer": "Arpa",
+    "difficulty": "medio",
+    "category": "musica"
+  },
+  {
+    "id": "0e20a9dc-ea8f-4e6d-a2c1-ecab090a9189",
+    "letter": "A",
+    "question": "Capital de Grecia",
+    "answer": "Atenas",
+    "difficulty": "medio",
+    "category": "geografia"
+  },
+  {
+    "id": "0923deb1-3334-4a00-8555-e25a62503d03",
     "letter": "B",
     "question": "Sitio poblado de árboles y matas",
     "answer": "Bosque",
@@ -32,7 +64,7 @@
     "category": "naturaleza"
   },
   {
-    "id": "b2",
+    "id": "2fb366b6-76f0-4e58-bd36-6da564eb5f89",
     "letter": "B",
     "question": "Deporte que se juega con una pelota y dos aros elevados",
     "answer": "Baloncesto",
@@ -40,15 +72,31 @@
     "category": "deportes"
   },
   {
-    "id": "c1",
-    "letter": "C",
-    "question": "Bebida fermentada de cebada",
-    "answer": "Cerveza",
+    "id": "4ad1e52b-af6c-4be7-a8d4-2cd727076eea",
+    "letter": "B",
+    "question": "Embarcación para navegar",
+    "answer": "Barco",
     "difficulty": "facil",
-    "category": "comida"
+    "category": "transporte"
   },
   {
-    "id": "c2",
+    "id": "b910a89b-57d1-43e5-b01c-5eb224a3a1d0",
+    "letter": "B",
+    "question": "Deporte que se juega con una pelota y dos aros elevados",
+    "answer": "Basquet",
+    "difficulty": "facil",
+    "category": "deportes"
+  },
+  {
+    "id": "3564485d-14fe-499a-a85e-d681b9dafcfa",
+    "letter": "B",
+    "question": "Escritor argentino autor de 'El Aleph' y 'Ficciones'",
+    "answer": "Borges",
+    "difficulty": "dificil",
+    "category": "literatura"
+  },
+  {
+    "id": "4862dc4f-3770-4596-ada0-f77f15e19445",
     "letter": "C",
     "question": "Bebida caliente hecha con granos tostados",
     "answer": "Café",
@@ -56,7 +104,31 @@
     "category": "comida"
   },
   {
-    "id": "d1",
+    "id": "357fd975-11e8-4cab-943c-e3fec04faf2d",
+    "letter": "C",
+    "question": "Tejido flexible que recubre articulaciones y nariz",
+    "answer": "Cartílago",
+    "difficulty": "dificil",
+    "category": "anatomia"
+  },
+  {
+    "id": "06a5a5ab-cb8f-44b9-9639-7290f2cccdfd",
+    "letter": "C",
+    "question": "Bebida fermentada de cebada",
+    "answer": "Cerveza",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "3588866f-5c15-4fc2-abe2-deed8f927572",
+    "letter": "C",
+    "question": "Vehículo de cuatro ruedas",
+    "answer": "Coche",
+    "difficulty": "facil",
+    "category": "transporte"
+  },
+  {
+    "id": "5d65955b-bb25-4f0f-a49d-b50329c66e4a",
     "letter": "D",
     "question": "Territorio arenoso o pedregoso con escasa vegetación",
     "answer": "Desierto",
@@ -64,7 +136,63 @@
     "category": "geografia"
   },
   {
-    "id": "e1",
+    "id": "2934e255-e89e-4564-be97-153d7a20fd38",
+    "letter": "D",
+    "question": "Gas formado por carbono y oxígeno presente en respiración y combustión",
+    "answer": "Dióxido de carbono",
+    "difficulty": "dificil",
+    "category": "quimica"
+  },
+  {
+    "id": "6d3c35b0-9bff-49ed-906a-045b24e98191",
+    "letter": "D",
+    "question": "Forma de gobierno donde el pueblo elige",
+    "answer": "Democracia",
+    "difficulty": "medio",
+    "category": "politica"
+  },
+  {
+    "id": "135e4009-f31f-4d99-adbe-a675e97caa86",
+    "letter": "D",
+    "question": "Actor estadounidense protagonista de Titanic",
+    "answer": "DiCaprio",
+    "difficulty": "dificil",
+    "category": "espectaculos"
+  },
+  {
+    "id": "5fda1983-890d-4a82-85d6-351547df2201",
+    "letter": "E",
+    "question": "Lugar donde se enseña",
+    "answer": "Escuela",
+    "difficulty": "facil",
+    "category": "educacion"
+  },
+  {
+    "id": "69c9b139-d55c-4e57-9b64-662d49bb0935",
+    "letter": "E",
+    "question": "Animal paquidermo con trompa",
+    "answer": "Elefante",
+    "difficulty": "facil",
+    "category": "animales"
+  },
+  {
+    "id": "2ccbeb4f-3b99-44b8-8bb1-161914d356bd",
+    "letter": "E",
+    "question": "Conjunto de seres vivos y su entorno que interactúan",
+    "answer": "Ecosistema",
+    "difficulty": "dificil",
+    "category": "ciencia"
+  },
+  {
+    "id": "e5f790c3-f9d3-42f8-9db8-db501304364c",
+    "letter": "E",
+    "question": "Persona de baja estatura",
+    "answer": "Enano",
+    "difficulty": "facil",
+    "category": "general"
+  },
+  {
+    "id": "1a67a8f9-c1b1-45b5-8958-8e1d92be7759",
     "letter": "E",
     "question": "Ocultación de un astro por otro",
     "answer": "Eclipse",
@@ -72,11 +200,691 @@
     "category": "astronomia"
   },
   {
-    "id": "e2",
-    "letter": "E",
-    "question": "Animal paquidermo con trompa",
-    "answer": "Elefante",
+    "id": "0d37fed0-6999-4435-ab5f-1d91d8446aaa",
+    "letter": "F",
+    "question": "Deporte que se juega con los pies",
+    "answer": "Fútbol",
+    "difficulty": "facil",
+    "category": "deportes"
+  },
+  {
+    "id": "07371129-4e8d-400a-95f8-54ae9dc44efb",
+    "letter": "F",
+    "question": "Historia breve con enseñanza moral",
+    "answer": "Fábula",
+    "difficulty": "facil",
+    "category": "literatura"
+  },
+  {
+    "id": "04ebc997-738f-407e-a70a-2b5a82fca267",
+    "letter": "F",
+    "question": "Red social más grande del mundo",
+    "answer": "Facebook",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "417cb986-deea-4bbb-88cf-9cb17d61ea89",
+    "letter": "F",
+    "question": "Proceso por el cual las plantas convierten luz en energía",
+    "answer": "Fotosíntesis",
+    "difficulty": "dificil",
+    "category": "biologia"
+  },
+  {
+    "id": "29ba5833-c031-4c35-8f3d-fe96cab91e1f",
+    "letter": "G",
+    "question": "Deporte que se juega con palos y pelota pequeña",
+    "answer": "Golf",
+    "difficulty": "facil",
+    "category": "deportes"
+  },
+  {
+    "id": "dd2e81ea-a7b5-489c-9a34-95583f2603ac",
+    "letter": "G",
+    "question": "Buscador de internet más utilizado",
+    "answer": "Google",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "0a209ec9-8230-4bae-bcf7-4761e4b159e9",
+    "letter": "G",
+    "question": "Animal doméstico que maúlla",
+    "answer": "Gato",
     "difficulty": "facil",
     "category": "animales"
+  },
+  {
+    "id": "34096d00-7703-49a7-b8aa-08fc7d953888",
+    "letter": "G",
+    "question": "Masa de hielo en movimiento formada por acumulación de nieve",
+    "answer": "Glaciar",
+    "difficulty": "dificil",
+    "category": "geografia"
+  },
+  {
+    "id": "1c61d26a-8064-433f-b984-ded0e81d76d3",
+    "letter": "H",
+    "question": "Lugar donde vive una familia",
+    "answer": "Hogar",
+    "difficulty": "facil",
+    "category": "general"
+  },
+  {
+    "id": "1074629f-5060-4d3b-b5c6-4f802c5d6ae1",
+    "letter": "H",
+    "question": "Proteína de la sangre que transporta oxígeno",
+    "answer": "Hemoglobina",
+    "difficulty": "dificil",
+    "category": "biologia"
+  },
+  {
+    "id": "40cd46de-a34d-45b7-a743-1b3f7f38cd6f",
+    "letter": "H",
+    "question": "Postre frío hecho con leche y azúcar",
+    "answer": "Helado",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "1f69a3c5-b983-48f7-80c7-826ae3f9f058",
+    "letter": "H",
+    "question": "Deporte que se juega sobre hielo",
+    "answer": "Hockey",
+    "difficulty": "medio",
+    "category": "deportes"
+  },
+  {
+    "id": "2daad7bd-b057-4fad-91e8-a46db81607bc",
+    "letter": "I",
+    "question": "Aplicación móvil para compartir fotos",
+    "answer": "Instagram",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "539bc260-1fc0-4612-8849-a3520bf6c28d",
+    "letter": "I",
+    "question": "Lugar donde se reza",
+    "answer": "Iglesia",
+    "difficulty": "facil",
+    "category": "religion"
+  },
+  {
+    "id": "46f87b21-23f8-4650-9ab1-d5014a1456ce",
+    "letter": "I",
+    "question": "Estación del año más fría",
+    "answer": "Invierno",
+    "difficulty": "facil",
+    "category": "naturaleza"
+  },
+  {
+    "id": "06e43a65-573a-40b1-82ec-28db7479327f",
+    "letter": "I",
+    "question": "Aumento generalizado y sostenido de los precios",
+    "answer": "Inflación",
+    "difficulty": "dificil",
+    "category": "economia"
+  },
+  {
+    "id": "2635b0e5-ac3e-42ff-8a4f-195db8743e85",
+    "letter": "J",
+    "question": "Profesión que administra justicia",
+    "answer": "Juez",
+    "difficulty": "medio",
+    "category": "profesiones"
+  },
+  {
+    "id": "67883f70-91c7-43fa-b781-8f26ddee7877",
+    "letter": "J",
+    "question": "Planeta más grande del sistema solar",
+    "answer": "Júpiter",
+    "difficulty": "dificil",
+    "category": "astronomia"
+  },
+  {
+    "id": "19c05ecc-dbd9-43af-a643-9d05ef7b8a1a",
+    "letter": "J",
+    "question": "Lugar donde se cultivan plantas",
+    "answer": "Jardín",
+    "difficulty": "facil",
+    "category": "naturaleza"
+  },
+  {
+    "id": "2bcfdde7-c765-4e7e-8b59-c811c07bb2f2",
+    "letter": "J",
+    "question": "Cantante estadounidense 'King of Pop'",
+    "answer": "Jackson",
+    "difficulty": "medio",
+    "category": "espectaculos"
+  },
+  {
+    "id": "02b2e539-2341-4aec-8042-f37c270dd15a",
+    "letter": "K",
+    "question": "Aderezo de tomate dulce y ácido",
+    "answer": "Ketchup",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "02f293ee-3977-4a53-a287-061975821558",
+    "letter": "K",
+    "question": "Unidad de longitud equivalente a mil metros",
+    "answer": "Kilómetro",
+    "difficulty": "dificil",
+    "category": "medidas"
+  },
+  {
+    "id": "21fd083d-1541-41c9-8752-3c3e0b2a7982",
+    "letter": "K",
+    "question": "Unidad de peso de mil gramos",
+    "answer": "Kilogramo",
+    "difficulty": "facil",
+    "category": "medidas"
+  },
+  {
+    "id": "0752b615-8b8c-43fb-8678-939a87c822e9",
+    "letter": "K",
+    "question": "Arte marcial japonés de golpes con manos y pies",
+    "answer": "Karate",
+    "difficulty": "medio",
+    "category": "deportes"
+  },
+  {
+    "id": "5bc7734b-ec5b-42ac-ae77-6a0744143e39",
+    "letter": "L",
+    "question": "Animal que ruge en la selva",
+    "answer": "León",
+    "difficulty": "facil",
+    "category": "animales"
+  },
+  {
+    "id": "3efd3ab5-c20c-4348-9859-1ffb5ac22be2",
+    "letter": "L",
+    "question": "Bebida blanca que dan las vacas",
+    "answer": "Leche",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "28d77d9c-02cc-414e-a54e-0f1b0fa09ecc",
+    "letter": "L",
+    "question": "Estructura de caminos complicados diseñada para confundir",
+    "answer": "Laberinto",
+    "difficulty": "medio",
+    "category": "general"
+  },
+  {
+    "id": "029c60f8-aa8e-496f-9fea-11c509370f1e",
+    "letter": "L",
+    "question": "Satélite natural de la Tierra",
+    "answer": "Luna",
+    "difficulty": "facil",
+    "category": "astronomia"
+  },
+  {
+    "id": "2e2c33ee-9826-441c-be94-c7dc434d68fc",
+    "letter": "L",
+    "question": "Coordenada geográfica que indica la distancia al ecuador",
+    "answer": "Latitud",
+    "difficulty": "dificil",
+    "category": "geografia"
+  },
+  {
+    "id": "8d4a339c-e83c-4ac9-86dd-abacb252f2bc",
+    "letter": "L",
+    "question": "Sistema operativo open source muy usado para programar.",
+    "answer": "Linux",
+    "difficulty": "medio",
+    "category": "tecnologia"
+  },
+  {
+    "id": "35162312-9da3-466b-bc52-aac55e371a7e",
+    "letter": "M",
+    "question": "Fruto del manzano",
+    "answer": "Manzana",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "13626c1d-5223-4bf1-b889-74db34ff5023",
+    "letter": "M",
+    "question": "Videojuego de construcción con bloques",
+    "answer": "Minecraft",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "1491cb93-bfc3-4f01-a362-3e6bce25157e",
+    "letter": "M",
+    "question": "Futbolista argentino apodado 'La Pulga'",
+    "answer": "Messi",
+    "difficulty": "medio",
+    "category": "deportes"
+  },
+  {
+    "id": "2b5e70a0-9299-4332-b0a4-3237dc719ed9",
+    "letter": "M",
+    "question": "Orgánulo celular encargado de producir energía",
+    "answer": "Mitocondria",
+    "difficulty": "dificil",
+    "category": "biologia"
+  },
+  {
+    "id": "2f8a6a03-13e3-4cd8-a967-61959b64bd19",
+    "letter": "N",
+    "question": "Plataforma de streaming de series y películas",
+    "answer": "Netflix",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "42fa5ed4-1593-4bf4-af5f-6e6643cdb662",
+    "letter": "N",
+    "question": "Masa de vapor de agua suspendida en la atmósfera",
+    "answer": "Nube",
+    "difficulty": "facil",
+    "category": "naturaleza"
+  },
+  {
+    "id": "44ae818d-d4a6-482e-8dc2-74c4af4cf92b",
+    "letter": "N",
+    "question": "Órgano del olfato",
+    "answer": "Nariz",
+    "difficulty": "facil",
+    "category": "anatomia"
+  },
+  {
+    "id": "5ac56441-dcc8-49c6-8cc9-cda7aa4192c2",
+    "letter": "N",
+    "question": "Gas que compone la mayor parte del aire",
+    "answer": "Nitrógeno",
+    "difficulty": "dificil",
+    "category": "quimica"
+  },
+  {
+    "id": "6237f321-5e84-45d6-8279-2a386de5f29b",
+    "letter": "O",
+    "question": "Órgano de los sentidos para oír",
+    "answer": "Oído",
+    "difficulty": "facil",
+    "category": "anatomia"
+  },
+  {
+    "id": "2fa9b319-0a99-45b2-88fa-000310627283",
+    "letter": "O",
+    "question": "Órganos de la vista",
+    "answer": "Ojos",
+    "difficulty": "facil",
+    "category": "anatomia"
+  },
+  {
+    "id": "06972d6f-6b4e-4b07-b512-7d83d9fab5f1",
+    "letter": "O",
+    "question": "Trayectoria que sigue un cuerpo alrededor de otro por gravedad",
+    "answer": "Órbita",
+    "difficulty": "dificil",
+    "category": "astronomia"
+  },
+  {
+    "id": "63339d7c-0c51-435f-ba19-843f556064c3",
+    "letter": "O",
+    "question": "Capital de Noruega",
+    "answer": "Oslo",
+    "difficulty": "medio",
+    "category": "geografia"
+  },
+  {
+    "id": "3c1c5c36-3b8f-4397-8161-ecf458deb014",
+    "letter": "P",
+    "question": "Animal doméstico fiel al hombre",
+    "answer": "Perro",
+    "difficulty": "facil",
+    "category": "animales"
+  },
+  {
+    "id": "37e1c670-a894-4fdc-8f04-a34f31c2ab77",
+    "letter": "P",
+    "question": "Instrumento musical de teclas",
+    "answer": "Piano",
+    "difficulty": "medio",
+    "category": "musica"
+  },
+  {
+    "id": "358fb148-d660-4469-9479-4a7ef9051614",
+    "letter": "P",
+    "question": "Supercontinente que existió hace cientos de millones de años",
+    "answer": "Pangea",
+    "difficulty": "dificil",
+    "category": "geologia"
+  },
+  {
+    "id": "264c6429-0053-4511-85ca-37787232d6d9",
+    "letter": "P",
+    "question": "Líquido que se bebe que se prepara y tiene propiedades medicinales o mágicas",
+    "answer": "Pocion",
+    "difficulty": "dificil",
+    "category": "general"
+  },
+  {
+    "id": "114df80c-8318-4214-b4db-08f3bd198f45",
+    "letter": "P",
+    "question": "Comida italiana hecha con masa, salsa y queso",
+    "answer": "Pizza",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "1676c7aa-3575-416f-956b-390937a66c84",
+    "letter": "Q",
+    "question": "Capital de Ecuador",
+    "answer": "Quito",
+    "difficulty": "medio",
+    "category": "geografia"
+  },
+  {
+    "id": "1cc2129b-1149-4965-83a1-b8cb53fe2c25",
+    "letter": "Q",
+    "question": "Número mínimo de miembros necesarios para sesionar",
+    "answer": "Quórum",
+    "difficulty": "dificil",
+    "category": "derecho"
+  },
+  {
+    "id": "238ba0eb-8f13-4cbf-a2f3-8fa72f4b8885",
+    "letter": "Q",
+    "question": "Ciencia que estudia las sustancias",
+    "answer": "Química",
+    "difficulty": "medio",
+    "category": "ciencia"
+  },
+  {
+    "id": "015e0acb-58e0-4249-aa91-2a91b4b86181",
+    "letter": "Q",
+    "question": "Producto lácteo para untar",
+    "answer": "Queso",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "37505e5a-c580-4aa9-a038-f3bcfd75bcee",
+    "letter": "R",
+    "question": "Capital de Italia",
+    "answer": "Roma",
+    "difficulty": "medio",
+    "category": "geografia"
+  },
+  {
+    "id": "80816707-ba07-4425-a941-1d4b84ce8a52",
+    "letter": "R",
+    "question": "Animal roedor pequeño",
+    "answer": "Ratón",
+    "difficulty": "facil",
+    "category": "animales"
+  },
+  {
+    "id": "3e85973b-d38b-4d3e-aaf8-432a4fb1f915",
+    "letter": "R",
+    "question": "Corriente de agua natural",
+    "answer": "Río",
+    "difficulty": "facil",
+    "category": "naturaleza"
+  },
+  {
+    "id": "0fb7b16c-4a8a-4052-bea0-86d516295735",
+    "letter": "R",
+    "question": "Energía que se propaga en forma de ondas o partículas",
+    "answer": "Radiación",
+    "difficulty": "dificil",
+    "category": "fisica"
+  },
+  {
+    "id": "056fc199-8de5-45b0-a065-81fe6f574765",
+    "letter": "S",
+    "question": "Astro que da luz y calor",
+    "answer": "Sol",
+    "difficulty": "facil",
+    "category": "astronomia"
+  },
+  {
+    "id": "332969ba-ec15-493d-8309-026aa14f11ec",
+    "letter": "S",
+    "question": "Reptil que reptan sin patas",
+    "answer": "Serpiente",
+    "difficulty": "facil",
+    "category": "animales"
+  },
+  {
+    "id": "0f4611c4-2b0a-45a4-8cfe-31443231a327",
+    "letter": "S",
+    "question": "Servicio de música en streaming",
+    "answer": "Spotify",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "08ea99f7-3259-45f2-b164-ebfd783af369",
+    "letter": "S",
+    "question": "Conexión funcional entre neuronas para transmitir señales",
+    "answer": "Sinapsis",
+    "difficulty": "dificil",
+    "category": "biologia"
+  },
+  {
+    "id": "653d72df-df2c-4aa7-8b87-909e8b7fd2ce",
+    "letter": "T",
+    "question": "Medio de transporte sobre rieles",
+    "answer": "Tren",
+    "difficulty": "facil",
+    "category": "general"
+  },
+  {
+    "id": "25d83028-756b-4ed5-854f-b0165922c1e1",
+    "letter": "T",
+    "question": "Capital de Japón",
+    "answer": "Tokio",
+    "difficulty": "medio",
+    "category": "geografia"
+  },
+  {
+    "id": "240da4ef-39ec-4afd-a748-fe648a4ffb21",
+    "letter": "T",
+    "question": "Instrumento que mide la temperatura",
+    "answer": "Termómetro",
+    "difficulty": "dificil",
+    "category": "instrumentos"
+  },
+  {
+    "id": "29d49546-59de-4c7a-aef3-8dff80a7ea32",
+    "letter": "T",
+    "question": "Animal felino con rayas",
+    "answer": "Tigre",
+    "difficulty": "facil",
+    "category": "animales"
+  },
+  {
+    "id": "0c86b897-7c53-4be1-8c23-2b6ea94d81a7",
+    "letter": "U",
+    "question": "Tipo de radiación electromagnética más energética que la luz violeta",
+    "answer": "Ultravioleta",
+    "difficulty": "dificil",
+    "category": "fisica"
+  },
+  {
+    "id": "34512890-a0ce-4d08-8b77-dfe9caeef623",
+    "letter": "U",
+    "question": "Fruta morada en racimos",
+    "answer": "Uva",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "232f2480-59e5-4c0b-aab4-5a1beddce54f",
+    "letter": "U",
+    "question": "Vestimenta igual para todos en un grupo",
+    "answer": "Uniforme",
+    "difficulty": "facil",
+    "category": "vestimenta"
+  },
+  {
+    "id": "31a43d7c-fd6a-413f-96d5-e1cd89790b13",
+    "letter": "U",
+    "question": "Servicio de transporte por aplicación",
+    "answer": "Uber",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "23bb4fec-1072-4cc9-b172-16fd958246c3",
+    "letter": "V",
+    "question": "Animal que da leche",
+    "answer": "Vaca",
+    "difficulty": "facil",
+    "category": "animales"
+  },
+  {
+    "id": "0c80e187-c3ca-4cb9-a79a-603e89ce1f98",
+    "letter": "V",
+    "question": "Deporte de pelota con red alta",
+    "answer": "Voleibol",
+    "difficulty": "medio",
+    "category": "deportes"
+  },
+  {
+    "id": "48e3e3e4-9a1c-4f47-bca7-bd03f9fb1425",
+    "letter": "V",
+    "question": "Sustancia que estimula defensas para prevenir enfermedades",
+    "answer": "Vacuna",
+    "difficulty": "dificil",
+    "category": "medicina"
+  },
+  {
+    "id": "1503752b-d49f-44ff-bacd-a8c373c38552",
+    "letter": "V",
+    "question": "Bebida alcohólica hecha de uvas",
+    "answer": "Vino",
+    "difficulty": "facil",
+    "category": "comida"
+  },
+  {
+    "id": "1ce63285-29ee-4762-99bd-07ca0f68c637",
+    "letter": "W",
+    "question": "Bebida alcohólica destilada de cereales",
+    "answer": "Whisky",
+    "difficulty": "medio",
+    "category": "bebidas"
+  },
+  {
+    "id": "4690a3bf-e13b-4d94-ab9b-aaf7505fc1cb",
+    "letter": "W",
+    "question": "Red informática mundial",
+    "answer": "Web",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "4e91ac21-6b71-40dd-9b44-064ea4865d62",
+    "letter": "W",
+    "question": "Aplicación de mensajería para teléfonos",
+    "answer": "WhatsApp",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "0c404275-4835-4602-b8b8-d156c348bb49",
+    "letter": "W",
+    "question": "Tecnología que permite conexión inalámbrica a internet",
+    "answer": "Wifi",
+    "difficulty": "dificil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "378866a0-a028-427c-881e-89176d9cf9fb",
+    "letter": "X",
+    "question": "Consola de videojuegos de Microsoft",
+    "answer": "Xbox",
+    "difficulty": "medio",
+    "category": "tecnologia"
+  },
+  {
+    "id": "0d89a881-b3a7-4331-8685-9228f24217a6",
+    "letter": "X",
+    "question": "Elemento químico noble usado en lámparas y flashes",
+    "answer": "Xenón",
+    "difficulty": "dificil",
+    "category": "quimica"
+  },
+  {
+    "id": "030d4e55-8c80-4b57-a258-2c6e5f898056",
+    "letter": "X",
+    "question": "Instrumento musical de percusión",
+    "answer": "Xilófono",
+    "difficulty": "medio",
+    "category": "musica"
+  },
+  {
+    "id": "4e86ce6d-822f-4888-beff-eb343256087e",
+    "letter": "Y",
+    "question": "Parte central del huevo",
+    "answer": "Yema",
+    "difficulty": "medio",
+    "category": "comida"
+  },
+  {
+    "id": "00956c3b-5c01-42af-bcea-2b511f9e2acd",
+    "letter": "Y",
+    "question": "Embarcación de recreo",
+    "answer": "Yate",
+    "difficulty": "medio",
+    "category": "nautica"
+  },
+  {
+    "id": "25420afd-a033-4936-bc6f-90d020520171",
+    "letter": "Y",
+    "question": "Plataforma de videos en línea más utilizada",
+    "answer": "YouTube",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "10ef4bc2-9151-41a8-9d9b-71aa10ce6887",
+    "letter": "Y",
+    "question": "Elemento químico usado como antiséptico y en la tiroides",
+    "answer": "Yodo",
+    "difficulty": "dificil",
+    "category": "quimica"
+  },
+  {
+    "id": "09abb70f-4e82-40b2-86ac-c4c84d0f6f1c",
+    "letter": "Z",
+    "question": "Lugar donde se exhiben animales",
+    "answer": "Zoológico",
+    "difficulty": "medio",
+    "category": "lugares"
+  },
+  {
+    "id": "35ff135d-99fd-4d8e-88b7-ca6fe6a49b89",
+    "letter": "Z",
+    "question": "Rama de la biología que estudia a los animales",
+    "answer": "Zoología",
+    "difficulty": "dificil",
+    "category": "biologia"
+  },
+  {
+    "id": "32406b4a-79a4-4462-9a9f-8b401b18c632",
+    "letter": "Z",
+    "question": "Plataforma de videollamadas muy usada en pandemia",
+    "answer": "Zoom",
+    "difficulty": "facil",
+    "category": "tecnologia"
+  },
+  {
+    "id": "50b9b7e1-f17e-443a-ae79-aae10a400c27",
+    "letter": "Z",
+    "question": "Calzado que cubre el pie",
+    "answer": "Zapato",
+    "difficulty": "facil",
+    "category": "vestimenta"
   }
 ]
