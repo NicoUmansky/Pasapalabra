@@ -184,16 +184,6 @@ export default function PasapalabraGame() {
 
           {/* Panel de Control */}
           <div className="space-y-4 lg:space-y-6 order-2">
-            {gameState.isPlaying && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 sm:p-4">
-                <GameProgress
-                  totalLetters={26}
-                  completedLetters={completedLetters}
-                  currentLetter={gameState.currentLetter}
-                />
-              </div>
-            )}
-
             {/* Estado del Juego */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
               {!gameState.isPlaying ? (
@@ -265,8 +255,18 @@ export default function PasapalabraGame() {
               )}
             </div>
 
+            {gameState.isPlaying && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 sm:p-4 order-3 lg:order-2">
+                <GameProgress
+                  totalLetters={26}
+                  completedLetters={completedLetters}
+                  currentLetter={gameState.currentLetter}
+                />
+              </div>
+            )}
+
             {/* Estadísticas */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 sm:p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 sm:p-4 order-4 lg:order-3">
               <GameStats score={gameState.score} />
             </div>
           </div>

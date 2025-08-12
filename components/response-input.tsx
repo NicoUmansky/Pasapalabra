@@ -222,13 +222,14 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Escribe tu respuesta..."
-                disabled={showCorrectAnswer || isProcessing}
+                disabled={showCorrectAnswer}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !showCorrectAnswer && !isProcessing) {
                     handleSubmit()
                   }
                 }}
-                className="flex-1 text-xs sm:text-sm lg:text-base py-2 sm:py-3"
+                className="flex-1 text-xs sm:text-sm lg:text-base py-2 sm:py-3 min-w-0"
+                style={{ wordBreak: "break-word", overflowWrap: "break-word" }}
               />
 
               {speechSupported && (
@@ -236,7 +237,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
                   onClick={handleVoiceToggle}
                   variant={isListening ? "destructive" : "outline"}
                   size="icon"
-                  disabled={showCorrectAnswer || isProcessing}
+                  disabled={showCorrectAnswer}
                   className="shrink-0 h-9 w-9 sm:h-10 sm:w-10"
                 >
                   {isListening ? (
@@ -260,7 +261,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
             <div className="flex flex-col gap-2 justify-center">
               <Button
                 onClick={() => handleSubmit()}
-                disabled={!inputValue.trim() || showCorrectAnswer || isProcessing}
+                disabled={!inputValue.trim() || showCorrectAnswer}
                 className="bg-blue-500 hover:bg-blue-600 text-xs sm:text-sm lg:text-base py-2 sm:py-3"
               >
                 Responder
@@ -268,7 +269,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
               <Button
                 onClick={onPassapalabra}
                 variant="outline"
-                disabled={showCorrectAnswer || isProcessing}
+                disabled={showCorrectAnswer}
                 className="text-xs sm:text-sm lg:text-base py-2 sm:py-3 bg-transparent"
               >
                 Pasapalabra
