@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { getMobileSpeechConfig, detectPasapalabra } from "@/lib/mobile-config"
 
 interface SpeechRecognitionResult {
   transcript: string
@@ -48,20 +49,14 @@ export function useSpeechRecognition({
         setIsSupported(true)
         const recognitionInstance = new SpeechRecognition()
 
-        recognitionInstance.continuous = continuous
-        recognitionInstance.interimResults = interimResults
-        recognitionInstance.lang = language
-        recognitionInstance.maxAlternatives = 1
-        
-        // Configuraciones adicionales para mejor compatibilidad móvil
-        recognitionInstance.grammars = null
-        recognitionInstance.serviceURI = null
-        
-        // Configuraciones específicas para móviles
-        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-          recognitionInstance.continuous = false // Mejor compatibilidad en móviles
-          recognitionInstance.interimResults = false // Resultados más estables en móviles
-        }
+        // Usar configuraciones optimizadas para móviles
+        const mobileConfig = getMobileSpeechConfig()
+        recognitionInstance.continuous = mobileConfig.continuous
+        recognitionInstance.interimResults = mobileConfig.interimResults
+        recognitionInstance.lang = mobileConfig.lang
+        recognitionInstance.maxAlternatives = mobileConfig.maxAlternatives
+        recognitionInstance.grammars = mobileConfig.grammars
+        recognitionInstance.serviceURI = mobileConfig.serviceURI
 
         recognitionInstance.onstart = () => {
           console.log("Speech recognition started")
@@ -92,16 +87,8 @@ export function useSpeechRecognition({
           const fullTranscript = finalTranscript || interimTranscript
           setTranscript(fullTranscript)
 
-          // Detectar si se dijo "pasapalabra" o similar
-          const normalizedTranscript = fullTranscript.toLowerCase().trim()
-          const pasapalabraVariants = [
-            'pasapalabra', 'pasa palabra', 'pasa la palabra', 'pasar palabra',
-            'pasapalabras', 'pasa palabras', 'pasar palabras'
-          ]
-          
-          const isPasapalabra = pasapalabraVariants.some(variant => 
-            normalizedTranscript.includes(variant)
-          )
+          // Detectar si se dijo "pasapalabra" usando la función de configuración
+          const isPasapalabra = detectPasapalabra(fullTranscript)
 
           if (onResultRef.current && fullTranscript.trim()) {
             onResultRef.current({
@@ -148,7 +135,8 @@ export function useSpeechRecognition({
         setTranscript("")
         
         // En móviles, agregar un pequeño delay para mejor compatibilidad
-        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        const mobileConfig = getMobileSpeechConfig()
+        if (!mobileConfig.continuous) {
           setTimeout(() => {
             recognition.start()
           }, 100)

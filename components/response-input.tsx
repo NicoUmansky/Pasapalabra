@@ -23,6 +23,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
   const [inputValue, setInputValue] = useState("")
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false)
   const [lastResult, setLastResult] = useState<"correct" | "incorrect" | null>(null)
+  const [voicePasapalabra, setVoicePasapalabra] = useState(false)
 
   const {
     isListening,
@@ -41,7 +42,11 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
       // Si se detectó "pasapalabra", ejecutar esa acción
       if (result.isPasapalabra) {
         console.log("Pasapalabra detectado por voz")
-        onPassapalabra()
+        setVoicePasapalabra(true)
+        setTimeout(() => {
+          setVoicePasapalabra(false)
+          onPassapalabra()
+        }, 1000)
         return
       }
       
@@ -272,6 +277,14 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
                 <div className="text-xs text-gray-500">
                   💡 Di "pasapalabra" para saltar la pregunta
                 </div>
+              </div>
+            )}
+
+            {voicePasapalabra && (
+              <div className="text-center">
+                <Badge variant="default" className="bg-blue-500 animate-pulse text-xs sm:text-sm">
+                  🎤 ¡Pasapalabra detectado por voz!
+                </Badge>
               </div>
             )}
 
