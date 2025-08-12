@@ -9,9 +9,16 @@ interface MultiplayerRoscoProps {
   players: Player[]
   currentLetter: string
   currentPlayer?: Player
+  showOnlyActive?: boolean
 }
 
-export function MultiplayerRosco({ playerLetters, players, currentLetter, currentPlayer }: MultiplayerRoscoProps) {
+export function MultiplayerRosco({
+  playerLetters,
+  players,
+  currentLetter,
+  currentPlayer,
+  showOnlyActive = false,
+}: MultiplayerRoscoProps) {
   const radius = 120
   const centerX = 150
   const centerY = 150
@@ -38,9 +45,11 @@ export function MultiplayerRosco({ playerLetters, players, currentLetter, curren
     }
   }
 
+  const playersToShow = showOnlyActive && currentPlayer ? [currentPlayer] : players
+
   return (
-    <div className="grid grid-cols-2 gap-4">
-      {players.map((player) => {
+    <div className={cn("grid gap-4", showOnlyActive ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2")}>
+      {playersToShow.map((player) => {
         const letters = playerLetters[player.id] || []
         const isCurrentPlayer = currentPlayer?.id === player.id
 
@@ -58,7 +67,7 @@ export function MultiplayerRosco({ playerLetters, players, currentLetter, curren
             </div>
 
             <div className="flex justify-center">
-              <svg width="300" height="300" className="drop-shadow-sm">
+              <svg width="300" height="300" className="drop-shadow-sm max-w-full h-auto">
                 {/* Centro del rosco */}
                 <circle cx={centerX} cy={centerY} r="30" fill="#8B5CF6" className="drop-shadow-sm" />
                 <text

@@ -119,10 +119,12 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
     if (!isCorrect && settings.showCorrectAnswer) {
       setShowCorrectAnswer(true)
       setTimeout(() => {
+        setIsProcessing(false)
         onAnswer(false)
       }, 3000)
     } else {
       setTimeout(() => {
+        setIsProcessing(false)
         onAnswer(isCorrect)
       }, 1000)
     }
@@ -220,9 +222,9 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Escribe tu respuesta..."
-                disabled={disabled || showCorrectAnswer || isProcessing}
+                disabled={showCorrectAnswer || isProcessing}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !disabled && !showCorrectAnswer && !isProcessing) {
+                  if (e.key === "Enter" && !showCorrectAnswer && !isProcessing) {
                     handleSubmit()
                   }
                 }}
@@ -234,7 +236,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
                   onClick={handleVoiceToggle}
                   variant={isListening ? "destructive" : "outline"}
                   size="icon"
-                  disabled={disabled || showCorrectAnswer || isProcessing}
+                  disabled={showCorrectAnswer || isProcessing}
                   className="shrink-0 h-9 w-9 sm:h-10 sm:w-10"
                 >
                   {isListening ? (
@@ -258,15 +260,15 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
             <div className="flex flex-col gap-2 justify-center">
               <Button
                 onClick={() => handleSubmit()}
-                disabled={!inputValue.trim() || disabled || showCorrectAnswer || isProcessing}
+                disabled={!inputValue.trim() || showCorrectAnswer || isProcessing}
                 className="bg-blue-500 hover:bg-blue-600 text-xs sm:text-sm lg:text-base py-2 sm:py-3"
               >
-                {isProcessing ? "Procesando..." : "Responder"}
+                Responder
               </Button>
               <Button
                 onClick={onPassapalabra}
                 variant="outline"
-                disabled={disabled || showCorrectAnswer || isProcessing}
+                disabled={showCorrectAnswer || isProcessing}
                 className="text-xs sm:text-sm lg:text-base py-2 sm:py-3 bg-transparent"
               >
                 Pasapalabra

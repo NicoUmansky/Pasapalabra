@@ -4,13 +4,12 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { DifficultySelector } from "@/components/difficulty-indicator"
 import type { ExtendedSettings } from "@/hooks/use-settings"
-import { X, Volume2, VolumeX, Zap, Eye, Download, Upload, RotateCcw, Save } from "lucide-react"
+import { X, Download, Upload, RotateCcw, Save } from "lucide-react"
 
 interface AdvancedSettingsProps {
   settings: ExtendedSettings
@@ -70,11 +69,8 @@ export function AdvancedSettings({ settings, onSave, onClose, onReset, onExport,
           </div>
 
           <Tabs defaultValue="game" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="game">Juego</TabsTrigger>
-              <TabsTrigger value="audio">Audio</TabsTrigger>
-              <TabsTrigger value="visual">Visual</TabsTrigger>
-              <TabsTrigger value="accessibility">Accesibilidad</TabsTrigger>
               <TabsTrigger value="data">Datos</TabsTrigger>
             </TabsList>
 
@@ -127,9 +123,15 @@ export function AdvancedSettings({ settings, onSave, onClose, onReset, onExport,
                   <div>
                     <Label htmlFor="responseMode">Modo de Respuesta</Label>
                     <Select
-                      value={localSettings.responseMode}
-                      onValueChange={(value: "buttons" | "visible" | "input" | "voice") =>
-                        updateSetting("responseMode", value)
+                      value={
+                        localSettings.responseMode === "visible" ||
+                        localSettings.responseMode === "input" ||
+                        localSettings.responseMode === "voice"
+                          ? "input"
+                          : "buttons"
+                      }
+                      onValueChange={(value: "buttons" | "input") =>
+                        updateSetting("responseMode", value === "buttons" ? "buttons" : "input")
                       }
                     >
                       <SelectTrigger>
@@ -137,9 +139,7 @@ export function AdvancedSettings({ settings, onSave, onClose, onReset, onExport,
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="buttons">Botones</SelectItem>
-                        <SelectItem value="visible">Respuestas Visibles</SelectItem>
-                        <SelectItem value="input">Campo de Texto</SelectItem>
-                        <SelectItem value="voice">Reconocimiento de Voz</SelectItem>
+                        <SelectItem value="input">Entrada (Texto/Voz)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -168,165 +168,23 @@ export function AdvancedSettings({ settings, onSave, onClose, onReset, onExport,
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="autoAdvance">Avance Automático</Label>
-                      <p className="text-sm text-gray-600">Pasar automáticamente a la siguiente pregunta</p>
+                      <Label htmlFor="theme">Tema Visual</Label>
+                      <p className="text-sm text-gray-600">Seleccionar tema claro u oscuro</p>
                     </div>
-                    <Switch
-                      id="autoAdvance"
-                      checked={localSettings.autoAdvance}
-                      onCheckedChange={(checked) => updateSetting("autoAdvance", checked)}
-                    />
+                    <Select
+                      value={localSettings.theme}
+                      onValueChange={(value: "light" | "dark" | "auto") => updateSetting("theme", value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="light">Claro</SelectItem>
+                        <SelectItem value="dark">Oscuro</SelectItem>
+                        <SelectItem value="auto">Automático</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="showHints">Mostrar Pistas</Label>
-                      <p className="text-sm text-gray-600">Mostrar pistas adicionales durante el juego</p>
-                    </div>
-                    <Switch
-                      id="showHints"
-                      checked={localSettings.showHints}
-                      onCheckedChange={(checked) => updateSetting("showHints", checked)}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="customTime">Tiempo Personalizado</Label>
-                      <p className="text-sm text-gray-600">Usar tiempo personalizado en lugar de preestablecido</p>
-                    </div>
-                    <Switch
-                      id="customTime"
-                      checked={localSettings.customTimeEnabled}
-                      onCheckedChange={(checked) => updateSetting("customTimeEnabled", checked)}
-                    />
-                  </div>
-
-                  {localSettings.customTimeEnabled && (
-                    <div>
-                      <Label htmlFor="customTimeValue">Tiempo Personalizado (segundos)</Label>
-                      <Input
-                        id="customTimeValue"
-                        type="number"
-                        min="30"
-                        max="1800"
-                        value={localSettings.customTime || 150}
-                        onChange={(e) => updateSetting("customTime", Number.parseInt(e.target.value))}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="audio" className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {localSettings.soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-                    <div>
-                      <Label htmlFor="soundEnabled">Sonidos del Juego</Label>
-                      <p className="text-sm text-gray-600">Activar efectos de sonido y música</p>
-                    </div>
-                  </div>
-                  <Switch
-                    id="soundEnabled"
-                    checked={localSettings.soundEnabled}
-                    onCheckedChange={(checked) => updateSetting("soundEnabled", checked)}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="visual" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="theme">Tema Visual</Label>
-                  <Select
-                    value={localSettings.theme}
-                    onValueChange={(value: "light" | "dark" | "auto") => updateSetting("theme", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">Claro</SelectItem>
-                      <SelectItem value="dark">Oscuro</SelectItem>
-                      <SelectItem value="auto">Automático</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="language">Idioma</Label>
-                  <Select
-                    value={localSettings.language}
-                    onValueChange={(value: "es" | "en" | "fr") => updateSetting("language", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="es">Español</SelectItem>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-5 h-5" />
-                    <div>
-                      <Label htmlFor="animations">Animaciones</Label>
-                      <p className="text-sm text-gray-600">Activar animaciones y transiciones</p>
-                    </div>
-                  </div>
-                  <Switch
-                    id="animations"
-                    checked={localSettings.animations}
-                    onCheckedChange={(checked) => updateSetting("animations", checked)}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="accessibility" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="fontSize">Tamaño de Fuente</Label>
-                  <Select
-                    value={localSettings.fontSize}
-                    onValueChange={(value: "small" | "medium" | "large") => updateSetting("fontSize", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="small">Pequeño</SelectItem>
-                      <SelectItem value="medium">Mediano</SelectItem>
-                      <SelectItem value="large">Grande</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Eye className="w-5 h-5" />
-                    <div>
-                      <Label htmlFor="highContrast">Alto Contraste</Label>
-                      <p className="text-sm text-gray-600">Usar colores de alto contraste para mejor visibilidad</p>
-                    </div>
-                  </div>
-                  <Switch
-                    id="highContrast"
-                    checked={localSettings.highContrast}
-                    onCheckedChange={(checked) => updateSetting("highContrast", checked)}
-                  />
                 </div>
               </div>
             </TabsContent>

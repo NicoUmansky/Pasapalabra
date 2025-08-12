@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 
 interface SpeechRecognitionResult {
   transcript: string
@@ -27,6 +27,17 @@ export function useSpeechRecognition({
   const [isSupported, setIsSupported] = useState(false)
   const [transcript, setTranscript] = useState("")
   const [recognition, setRecognition] = useState<any>(null)
+
+  const onResultRef = useRef(onResult)
+  const onErrorRef = useRef(onError)
+
+  useEffect(() => {
+    onResultRef.current = onResult
+  }, [onResult])
+
+  useEffect(() => {
+    onErrorRef.current = onError
+  }, [onError])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -70,8 +81,8 @@ export function useSpeechRecognition({
           const fullTranscript = finalTranscript || interimTranscript
           setTranscript(fullTranscript)
 
-          if (onResult && fullTranscript.trim()) {
-            onResult({
+          if (onResultRef.current && fullTranscript.trim()) {
+            onResultRef.current({
               transcript: fullTranscript.trim(),
               confidence: event.results[event.results.length - 1]?.[0]?.confidence || 0.8,
               isFinal: event.results[event.results.length - 1]?.isFinal || false,
@@ -82,8 +93,8 @@ export function useSpeechRecognition({
         recognitionInstance.onerror = (event: any) => {
           console.error("Speech recognition error:", event.error)
           setIsListening(false)
-          if (onError) {
-            onError(event.error)
+          if (onErrorRef.current) {
+            onErrorRef.current(event.error)
           }
         }
 
@@ -93,7 +104,7 @@ export function useSpeechRecognition({
         setIsSupported(false)
       }
     }
-  }, [language, continuous, interimResults, onResult, onError])
+  }, [language, continuous, interimResults]) // Removed onResult and onError from dependencies
 
   const startListening = useCallback(() => {
     if (recognition && !isListening) {
@@ -102,12 +113,12 @@ export function useSpeechRecognition({
         recognition.start()
       } catch (error) {
         console.error("Error starting speech recognition:", error)
-        if (onError) {
-          onError("Error starting speech recognition")
+        if (onErrorRef.current) {
+          onErrorRef.current("Error starting speech recognition")
         }
       }
     }
-  }, [recognition, isListening, onError])
+  }, [recognition, isListening])
 
   const stopListening = useCallback(() => {
     if (recognition && isListening) {

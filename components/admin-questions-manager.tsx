@@ -106,8 +106,14 @@ export function AdminQuestionsManager() {
       setQuestions(newQuestions)
       setEditingQuestion(null)
 
-      // Guardar en localStorage para persistencia
       localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
+
+      // Sincronizar con el objeto questionsData global
+      if (typeof window !== "undefined") {
+        const questionsArray = Object.values(newQuestions).flat()
+        localStorage.setItem("questionsArray", JSON.stringify(questionsArray))
+      }
+
       alert("Pregunta actualizada exitosamente")
     }
   }
@@ -118,8 +124,14 @@ export function AdminQuestionsManager() {
       newQuestions[letter] = newQuestions[letter].filter((q) => q.id !== questionId)
       setQuestions(newQuestions)
 
-      // Guardar en localStorage
       localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
+
+      // Sincronizar con el objeto questionsData global
+      if (typeof window !== "undefined") {
+        const questionsArray = Object.values(newQuestions).flat()
+        localStorage.setItem("questionsArray", JSON.stringify(questionsArray))
+      }
+
       alert("Pregunta eliminada exitosamente")
     }
   }
@@ -153,12 +165,22 @@ export function AdminQuestionsManager() {
       id: Date.now().toString(),
     }
 
-    setQuestions((prev) => ({
-      ...prev,
-      [selectedLetter]: [...(prev[selectedLetter] || []), questionToSave],
-    }))
+    const newQuestions = {
+      ...questions,
+      [selectedLetter]: [...(questions[selectedLetter] || []), questionToSave],
+    }
 
+    setQuestions(newQuestions)
     setEditingQuestion(null)
+
+    localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
+
+    // Sincronizar con el objeto questionsData global
+    if (typeof window !== "undefined") {
+      const questionsArray = Object.values(newQuestions).flat()
+      localStorage.setItem("questionsArray", JSON.stringify(questionsArray))
+    }
+
     alert("Pregunta guardada correctamente")
   }
 

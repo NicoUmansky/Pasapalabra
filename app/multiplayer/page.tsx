@@ -133,22 +133,47 @@ export default function MultiplayerGame() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Roscos de Jugadores */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Rosco del Jugador Activo */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                <h2 className="text-2xl font-semibold text-center mb-6">Roscos de Jugadores</h2>
+              <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                <h2 className="text-xl sm:text-2xl font-semibold text-center mb-4 sm:mb-6">
+                  {currentPlayer ? `Rosco de ${currentPlayer.name}` : "Rosco"}
+                </h2>
                 <MultiplayerRosco
                   playerLetters={playerLetters}
                   players={gameState.players}
                   currentLetter={gameState.currentLetter}
                   currentPlayer={currentPlayer}
+                  showOnlyActive={true}
                 />
+
+                {/* Progreso del Rosco - Movido aquí para móvil */}
+                <div className="mt-6 lg:hidden">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Progreso del Rosco</h3>
+                    <div className="flex justify-between text-xs text-gray-600">
+                      <span>
+                        Completadas:{" "}
+                        {currentPlayer
+                          ? playerLetters[currentPlayer.id]?.filter((l) => l.status === "correct").length || 0
+                          : 0}
+                        /26
+                      </span>
+                      <span>
+                        Restantes:{" "}
+                        {currentPlayer
+                          ? playerLetters[currentPlayer.id]?.filter((l) => l.status === "pending").length || 26
+                          : 26}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Panel de Control y Marcador */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-1 space-y-4 sm:space-y-6">
               {/* Marcador */}
               <MultiplayerScoreboard
                 players={stats.players}
@@ -156,8 +181,43 @@ export default function MultiplayerGame() {
                 roundsCompleted={gameState.roundsCompleted}
               />
 
+              {/* Progreso del Rosco - Solo en desktop */}
+              <div className="hidden lg:block">
+                <div className="bg-white rounded-2xl shadow-lg p-4">
+                  <h3 className="text-lg font-semibold mb-4">Progreso del Rosco</h3>
+                  {currentPlayer && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Correctas:</span>
+                        <span className="font-medium text-green-600">
+                          {playerLetters[currentPlayer.id]?.filter((l) => l.status === "correct").length || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Incorrectas:</span>
+                        <span className="font-medium text-red-600">
+                          {playerLetters[currentPlayer.id]?.filter((l) => l.status === "incorrect").length || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Pasapalabra:</span>
+                        <span className="font-medium text-yellow-600">
+                          {playerLetters[currentPlayer.id]?.filter((l) => l.status === "skipped").length || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Restantes:</span>
+                        <span className="font-medium text-blue-600">
+                          {playerLetters[currentPlayer.id]?.filter((l) => l.status === "pending").length || 26}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Panel de Juego */}
-              <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
                 {!gameState.isPlaying ? (
                   <div className="text-center py-8">
                     <p className="text-gray-600 mb-4">Partida terminada</p>

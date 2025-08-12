@@ -859,10 +859,25 @@ export const questionsDatabase: Question[] = [
   },
 ]
 
+function loadQuestionsFromStorage(): Question[] {
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem("questionsArray")
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch (error) {
+        console.error("Error loading questions from storage:", error)
+      }
+    }
+  }
+  return questionsDatabase
+}
+
+const currentQuestions = loadQuestionsFromStorage()
+
 export const questionsData: Record<string, Question[]> = {}
 
-// Organizando preguntas por letra
-questionsDatabase.forEach((question) => {
+currentQuestions.forEach((question) => {
   if (!questionsData[question.letter]) {
     questionsData[question.letter] = []
   }
@@ -870,7 +885,17 @@ questionsDatabase.forEach((question) => {
 })
 
 export function getRandomQuestion(letter: string, difficulty: "facil" | "medio" | "dificil"): Question | null {
-  const letterQuestions = questionsData[letter] || []
+  const updatedQuestions = loadQuestionsFromStorage()
+  const updatedQuestionsData: Record<string, Question[]> = {}
+
+  updatedQuestions.forEach((question) => {
+    if (!updatedQuestionsData[question.letter]) {
+      updatedQuestionsData[question.letter] = []
+    }
+    updatedQuestionsData[question.letter].push(question)
+  })
+
+  const letterQuestions = updatedQuestionsData[letter] || []
   const filteredQuestions = letterQuestions.filter((q) => q.difficulty === difficulty)
 
   if (filteredQuestions.length === 0) {
