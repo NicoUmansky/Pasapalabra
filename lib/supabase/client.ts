@@ -1,9 +1,25 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("Variables de entorno de Supabase faltantes:", {
+    url: !!supabaseUrl,
+    key: !!supabaseAnonKey,
+  })
+}
+
+export const supabase = supabaseUrl && supabaseAnonKey ? createSupabaseClient(supabaseUrl, supabaseAnonKey) : null
+
+export const createClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "Variables de entorno de Supabase no configuradas. Verifica NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    )
+  }
+  return createSupabaseClient(supabaseUrl, supabaseAnonKey)
+}
 
 export type Question = {
   id?: string

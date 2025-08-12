@@ -17,6 +17,7 @@ import { useSettings } from "@/hooks/use-settings"
 import { Button } from "@/components/ui/button"
 import { Settings, Globe, Pause, Play, Users, Shield } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function PasapalabraGame() {
   const {
@@ -108,7 +109,17 @@ export default function PasapalabraGame() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">Pasapalabra</h1>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <Image
+              src="/logo.png"
+              alt="El Rosco Logo"
+              width={80}
+              height={80}
+              className="rounded-full shadow-lg"
+              priority
+            />
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">Pasapalabra</h1>
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-4">
             <Timer timeRemaining={gameState.timeRemaining} />
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">

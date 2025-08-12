@@ -15,14 +15,14 @@ interface ResponseInputProps {
   onAnswer: (isCorrect: boolean) => void
   onPassapalabra: () => void
   disabled?: boolean
+  showAnswer?: boolean // agregando prop para mostrar respuesta
 }
 
-export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: ResponseInputProps) {
+export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, showAnswer }: ResponseInputProps) {
   const { settings } = useSettings()
   const [inputValue, setInputValue] = useState("")
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false)
   const [lastResult, setLastResult] = useState<"correct" | "incorrect" | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
 
   const {
     isListening,
@@ -39,11 +39,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
       console.log("Speech result:", result)
       if (result.isFinal && result.transcript.trim()) {
         setInputValue(result.transcript.trim())
-        setTimeout(() => {
-          if (!isProcessing) {
-            handleSubmit(result.transcript.trim())
-          }
-        }, 1000)
+        handleSubmit(result.transcript.trim())
       }
     },
     onError: (error) => {
@@ -52,16 +48,15 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
   })
 
   useEffect(() => {
-    if (transcript && !isProcessing) {
+    if (transcript) {
       setInputValue(transcript)
     }
-  }, [transcript, isProcessing])
+  }, [transcript])
 
   useEffect(() => {
     setInputValue("")
     setShowCorrectAnswer(false)
     setLastResult(null)
-    setIsProcessing(false)
     resetTranscript()
     if (isListening) {
       stopListening()
@@ -102,12 +97,8 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
   }
 
   const handleSubmit = async (answer?: string) => {
-    if (isProcessing) return
-
     const finalAnswer = answer || inputValue
     if (!finalAnswer.trim()) return
-
-    setIsProcessing(true)
 
     if (isListening) {
       stopListening()
@@ -119,12 +110,10 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
     if (!isCorrect && settings.showCorrectAnswer) {
       setShowCorrectAnswer(true)
       setTimeout(() => {
-        setIsProcessing(false)
         onAnswer(false)
       }, 3000)
     } else {
       setTimeout(() => {
-        setIsProcessing(false)
         onAnswer(isCorrect)
       }, 1000)
     }
@@ -140,7 +129,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
     }
   }
 
-  if (settings.responseMode === "visible") {
+  if (settings.responseMode === "visible" || showAnswer) {
     return (
       <Card className="w-full max-w-sm sm:max-w-md mx-auto">
         <CardContent className="p-3 sm:p-6">
@@ -222,14 +211,19 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Escribe tu respuesta..."
-                disabled={showCorrectAnswer}
+                disabled={disabled || showCorrectAnswer}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !showCorrectAnswer && !isProcessing) {
+                  if (e.key === "Enter" && !showCorrectAnswer) {
                     handleSubmit()
                   }
                 }}
                 className="flex-1 text-xs sm:text-sm lg:text-base py-2 sm:py-3 min-w-0"
-                style={{ wordBreak: "break-word", overflowWrap: "break-word" }}
+                style={{
+                  wordBreak: "normal",
+                  overflowWrap: "anywhere",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                }}
               />
 
               {speechSupported && (
@@ -237,7 +231,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
                   onClick={handleVoiceToggle}
                   variant={isListening ? "destructive" : "outline"}
                   size="icon"
-                  disabled={showCorrectAnswer}
+                  disabled={disabled || showCorrectAnswer}
                   className="shrink-0 h-9 w-9 sm:h-10 sm:w-10"
                 >
                   {isListening ? (
@@ -261,7 +255,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
             <div className="flex flex-col gap-2 justify-center">
               <Button
                 onClick={() => handleSubmit()}
-                disabled={!inputValue.trim() || showCorrectAnswer}
+                disabled={!inputValue.trim() || showCorrectAnswer || disabled}
                 className="bg-blue-500 hover:bg-blue-600 text-xs sm:text-sm lg:text-base py-2 sm:py-3"
               >
                 Responder
@@ -269,7 +263,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled }: 
               <Button
                 onClick={onPassapalabra}
                 variant="outline"
-                disabled={showCorrectAnswer}
+                disabled={showCorrectAnswer || disabled}
                 className="text-xs sm:text-sm lg:text-base py-2 sm:py-3 bg-transparent"
               >
                 Pasapalabra

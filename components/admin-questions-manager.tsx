@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, Edit, Plus, X, Upload, Download, Check, Clock, ArrowLeft, BookOpen } from "lucide-react"
 import type { Question, Difficulty } from "@/lib/game-types"
 import { questionsDatabase } from "@/lib/questions-data"
+import { createClient } from "@/lib/supabase/client"
 
 interface PendingQuestion extends Question {
   id: string
@@ -52,8 +53,44 @@ export function AdminQuestionsManager() {
     downloadAnchorNode.remove()
   }
 
+  const saveToSupabase = async (questionsData: Record<string, Question[]>) => {
+    try {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        console.warn("Supabase no configurado, guardando solo en localStorage")
+        return true
+      }
+
+      const supabase = createClient()
+      const questionsArray = Object.values(questionsData).flat()
+
+      // Eliminar todas las preguntas existentes
+      await supabase.from("questions").delete().neq("id", "")
+
+      // Insertar las nuevas preguntas
+      const { error } = await supabase.from("questions").insert(
+        questionsArray.map((q) => ({
+          letter: q.letter,
+          question: q.question,
+          answer: q.answer,
+          difficulty: q.difficulty,
+          category: q.category,
+        })),
+      )
+
+      if (error) {
+        console.error("Error guardando en Supabase:", error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error("Error conectando con Supabase:", error)
+      return true
+    }
+  }
+
   useEffect(() => {
-    const loadQuestions = () => {
+    const loadQuestions = async () => {
       try {
         // Convertir el array de preguntas a objeto agrupado por letra
         const groupedQuestions: Record<string, Question[]> = {}
@@ -96,7 +133,7 @@ export function AdminQuestionsManager() {
     setEditingQuestion(question)
   }
 
-  const handleSaveEdit = (updatedQuestion: Question) => {
+  const handleSaveEdit = async (updatedQuestion: Question) => {
     const newQuestions = { ...questions }
     const letterQuestions = newQuestions[updatedQuestion.letter] || []
     const questionIndex = letterQuestions.findIndex((q) => q.id === updatedQuestion.id)
@@ -108,13 +145,19 @@ export function AdminQuestionsManager() {
 
       localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
 
+      const saved = await saveToSupabase(newQuestions)
+
       // Sincronizar con el objeto questionsData global
       if (typeof window !== "undefined") {
         const questionsArray = Object.values(newQuestions).flat()
         localStorage.setItem("questionsArray", JSON.stringify(questionsArray))
       }
 
-      alert("Pregunta actualizada exitosamente")
+      alert(
+        saved
+          ? "Pregunta actualizada y guardada en la base de datos"
+          : "Pregunta actualizada localmente (error en base de datos)",
+      )
     }
   }
 
@@ -149,7 +192,7 @@ export function AdminQuestionsManager() {
     return null
   }
 
-  const saveQuestion = () => {
+  const saveQuestion = async () => {
     const validation = validateQuestion(editingQuestion)
     if (validation) {
       alert(validation)
@@ -175,13 +218,15 @@ export function AdminQuestionsManager() {
 
     localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
 
+    const saved = await saveToSupabase(newQuestions)
+
     // Sincronizar con el objeto questionsData global
     if (typeof window !== "undefined") {
       const questionsArray = Object.values(newQuestions).flat()
       localStorage.setItem("questionsArray", JSON.stringify(questionsArray))
     }
 
-    alert("Pregunta guardada correctamente")
+    alert(saved ? "Pregunta guardada en la base de datos" : "Pregunta guardada localmente (error en base de datos)")
   }
 
   const approvePendingQuestion = (pendingQuestion: PendingQuestion) => {

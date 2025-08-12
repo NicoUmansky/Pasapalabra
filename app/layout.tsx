@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: "El Rosco - Pasapalabra",
   description: "Juego de Pasapalabra con IA y modo multijugador",
   generator: "v0.dev",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 }
 
 export default function RootLayout({
