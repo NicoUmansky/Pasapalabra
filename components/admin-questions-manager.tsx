@@ -31,6 +31,89 @@ export function AdminQuestionsManager() {
   const [activeTab, setActiveTab] = useState<"questions" | "pending">("questions")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const loadQuestionsFromSupabase = async () => {
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase.from("questions").select("*").order("letter", { ascending: true })
+
+      if (error) {
+        console.error("Error cargando desde Supabase:", error)
+        return
+      }
+
+      if (data && data.length > 0) {
+        // Convertir datos de Supabase al formato esperado
+        const supabaseQuestions = data.map((item) => ({
+          id: item.game_id || `${item.letter.toLowerCase()}${Math.random()}`,
+          letter: item.letter,
+          question: item.question,
+          answer: item.answer,
+          difficulty: item.difficulty,
+          category: item.category,
+        }))
+
+        // Agrupar por letra
+        const groupedQuestions: Record<string, Question[]> = {}
+        supabaseQuestions.forEach((question) => {
+          const letter = question.letter.toUpperCase()
+          if (!groupedQuestions[letter]) {
+            groupedQuestions[letter] = []
+          }
+          groupedQuestions[letter].push(question)
+        })
+
+        setQuestions(groupedQuestions)
+
+        // Sincronizar con localStorage para el juego
+        localStorage.setItem("questionsArray", JSON.stringify(supabaseQuestions))
+
+        // También actualizar el formato agrupado
+        const questionsObj: Record<string, Question[]> = {}
+        supabaseQuestions.forEach((q) => {
+          if (!questionsObj[q.letter]) questionsObj[q.letter] = []
+          questionsObj[q.letter].push(q)
+        })
+        localStorage.setItem("questionsDatabase", JSON.stringify(questionsObj))
+      }
+    } catch (error) {
+      console.error("Error conectando con Supabase:", error)
+    }
+  }
+
+  const exportQuestionsFromSupabase = async () => {
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase.from("questions").select("*").order("letter", { ascending: true })
+
+      if (error) {
+        console.error("Error exportando desde Supabase:", error)
+        return
+      }
+
+      if (data) {
+        // Convertir al formato del juego
+        const exportData = data.map((item) => ({
+          id: item.game_id || `${item.letter.toLowerCase()}${Math.random()}`,
+          letter: item.letter,
+          question: item.question,
+          answer: item.answer,
+          difficulty: item.difficulty,
+          category: item.category,
+        }))
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2))
+        const downloadAnchorNode = document.createElement("a")
+        downloadAnchorNode.setAttribute("href", dataStr)
+        downloadAnchorNode.setAttribute("download", "questions-supabase.json")
+        document.body.appendChild(downloadAnchorNode)
+        downloadAnchorNode.click()
+        downloadAnchorNode.remove()
+      }
+    } catch (error) {
+      console.error("Error exportando:", error)
+    }
+  }
+
   const importQuestions = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -44,14 +127,8 @@ export function AdminQuestionsManager() {
     }
   }
 
-  const exportQuestions = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions))
-    const downloadAnchorNode = document.createElement("a")
-    downloadAnchorNode.setAttribute("href", dataStr)
-    downloadAnchorNode.setAttribute("download", "questions.json")
-    document.body.appendChild(downloadAnchorNode)
-    downloadAnchorNode.click()
-    downloadAnchorNode.remove()
+  const exportQuestions = async () => {
+    await exportQuestionsFromSupabase()
   }
 
   const saveToSupabase = async (questionsData: Record<string, Question[]>) => {
@@ -97,6 +174,7 @@ export function AdminQuestionsManager() {
   useEffect(() => {
     const loadQuestions = async () => {
       try {
+<<<<<<< HEAD
         // Intentar cargar preguntas desde el archivo local más reciente
         let currentQuestions = questionsDatabase
         
@@ -122,8 +200,26 @@ export function AdminQuestionsManager() {
           }
           groupedQuestions[letter].push(question)
         })
+=======
+        await loadQuestionsFromSupabase()
 
-        setQuestions(groupedQuestions)
+        // Si no hay datos en Supabase, usar datos locales como fallback
+        const currentQuestions = Object.keys(questions).length
+        if (currentQuestions === 0) {
+          // Convertir el array de preguntas a objeto agrupado por letra
+          const groupedQuestions: Record<string, Question[]> = {}
+>>>>>>> parent of 0d76268 (Revert "feat: integrate Supabase as primary question source")
+
+          questionsDatabase.forEach((question) => {
+            const letter = question.letter.toUpperCase()
+            if (!groupedQuestions[letter]) {
+              groupedQuestions[letter] = []
+            }
+            groupedQuestions[letter].push(question)
+          })
+
+          setQuestions(groupedQuestions)
+        }
 
         // Cargar preguntas pendientes desde localStorage
         const savedPending = localStorage.getItem("pendingQuestions")
