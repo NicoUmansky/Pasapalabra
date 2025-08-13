@@ -1,5 +1,5 @@
 import type { Question } from "./game-types"
-import { syncQuestionsOnce, loadQuestionsFromLocalFile, updateLocalQuestionsFile } from "./supabase/questions-sync"
+import { syncQuestionsOnce, loadQuestionsFromLocalStorage, updateLocalQuestions } from "./supabase/questions-sync"
 
 // Preguntas por defecto (solo se usan si no hay archivo local ni conexión a Supabase)
 const defaultQuestions: Question[] = [
@@ -854,16 +854,16 @@ const defaultQuestions: Question[] = [
   },
 ]
 
-<<<<<<< HEAD
 // Función para cargar preguntas desde el archivo local o sincronizar desde Supabase
 async function loadQuestionsFromStorage(): Promise<Question[]> {
   try {
-    // Primero intentar cargar desde el archivo local
-    const localQuestions = loadQuestionsFromLocalFile()
+    // Primero intentar cargar desde el almacenamiento local (localStorage o archivo)
+    const localQuestions = loadQuestionsFromLocalStorage()
     
-    if (localQuestions.length > 0) {
-      console.log("Preguntas cargadas desde archivo local")
+    if (localQuestions && localQuestions.length > 0) {
+      console.log("Preguntas cargadas desde almacenamiento local")
       return localQuestions
+    }
     }
 
     // Si no hay archivo local, intentar sincronizar desde Supabase
@@ -896,45 +896,6 @@ export async function getCurrentQuestions(): Promise<Question[]> {
 
 // Función para cargar preguntas desde localStorage (para compatibilidad)
 function loadQuestionsFromLocalStorage(): Question[] {
-=======
-async function loadQuestionsFromSupabase(): Promise<Question[]> {
-  if (typeof window !== "undefined") {
-    try {
-      const { createClient } = await import("./supabase/client")
-      const supabase = createClient()
-
-      const { data, error } = await supabase.from("questions").select("*").order("letter", { ascending: true })
-
-      if (error) {
-        console.error("Error cargando desde Supabase:", error)
-        return loadQuestionsFromStorage()
-      }
-
-      if (data && data.length > 0) {
-        // Convertir datos de Supabase al formato esperado
-        const supabaseQuestions = data.map((item) => ({
-          id: item.game_id || `${item.letter.toLowerCase()}${Math.random()}`,
-          letter: item.letter,
-          question: item.question,
-          answer: item.answer,
-          difficulty: item.difficulty,
-          category: item.category,
-        }))
-
-        // Guardar en localStorage para acceso rápido
-        localStorage.setItem("questionsArray", JSON.stringify(supabaseQuestions))
-        return supabaseQuestions
-      }
-    } catch (error) {
-      console.error("Error conectando con Supabase:", error)
-    }
-  }
-
-  return loadQuestionsFromStorage()
-}
-
-function loadQuestionsFromStorage(): Question[] {
->>>>>>> parent of 0d76268 (Revert "feat: integrate Supabase as primary question source")
   if (typeof window !== "undefined") {
     const saved = localStorage.getItem("questionsArray")
     if (saved) {
@@ -948,7 +909,6 @@ function loadQuestionsFromStorage(): Question[] {
   return defaultQuestions
 }
 
-<<<<<<< HEAD
 // Inicializar las preguntas
 let currentQuestions: Question[] = defaultQuestions
 
@@ -964,29 +924,6 @@ export function getQuestionsByLetter(): Record<string, Question[]> {
   currentQuestions.forEach((question) => {
     if (!questionsData[question.letter]) {
       questionsData[question.letter] = []
-=======
-export const questionsData: Record<string, Question[]> = {}
-
-const currentQuestions = loadQuestionsFromStorage()
-
-currentQuestions.forEach((question) => {
-  if (!questionsData[question.letter]) {
-    questionsData[question.letter] = []
-  }
-  questionsData[question.letter].push(question)
-})
-
-export async function getRandomQuestion(
-  letter: string,
-  difficulty: "facil" | "medio" | "dificil",
-): Promise<Question | null> {
-  const updatedQuestions = await loadQuestionsFromSupabase()
-  const updatedQuestionsData: Record<string, Question[]> = {}
-
-  updatedQuestions.forEach((question) => {
-    if (!updatedQuestionsData[question.letter]) {
-      updatedQuestionsData[question.letter] = []
->>>>>>> parent of 0d76268 (Revert "feat: integrate Supabase as primary question source")
     }
     questionsData[question.letter].push(question)
   })
