@@ -44,6 +44,7 @@ export function useGameLogic() {
   >([])
 
   const [isProcessingResponse, setIsProcessingResponse] = useState(false)
+  const [isPausedForIncorrect, setIsPausedForIncorrect] = useState(false) // Estado específico para pausa por respuesta incorrecta
 
   const findNextPendingLetter = useCallback((letters: LetterState[], currentLetter: string): string | null => {
     const currentIndex = letters.findIndex((l) => l.letter === currentLetter)
@@ -247,11 +248,10 @@ export function useGameLogic() {
   )
 
   useEffect(() => {
-    if (gameState.isPlaying && !gameState.isPaused && gameState.timeRemaining > 0) {
+    if (gameState.isPlaying && !gameState.isPaused && !isPausedForIncorrect && gameState.timeRemaining > 0) {
       const timer = setInterval(() => {
         setGameState((prev) => {
           if (prev.timeRemaining <= 1) {
-            // Tiempo agotado
             setTimeout(() => endGame(), 100)
             return { ...prev, timeRemaining: 0 }
           }
@@ -261,13 +261,15 @@ export function useGameLogic() {
 
       return () => clearInterval(timer)
     }
-  }, [gameState.isPlaying, gameState.isPaused, gameState.timeRemaining, endGame])
+  }, [gameState.isPlaying, gameState.isPaused, isPausedForIncorrect, gameState.timeRemaining, endGame])
 
-  useEffect(() => {
-    if (gameState.isPlaying && gameState.score.remaining === 0) {
-      setTimeout(() => endGame(), 1500)
-    }
-  }, [gameState.isPlaying, gameState.score.remaining, endGame])
+  const pauseForIncorrect = useCallback(() => {
+    setIsPausedForIncorrect(true)
+  }, [])
+
+  const resumeFromIncorrect = useCallback(() => {
+    setIsPausedForIncorrect(false)
+  }, [])
 
   const getGameStats = useCallback(() => {
     const totalAnswered = gameState.score.correct + gameState.score.incorrect
@@ -294,5 +296,7 @@ export function useGameLogic() {
     updateSettings,
     jumpToLetter,
     getGameStats,
+    pauseForIncorrect, // Exportar nueva función
+    resumeFromIncorrect, // Exportar nueva función
   }
 }
