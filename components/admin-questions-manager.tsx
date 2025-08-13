@@ -31,6 +31,8 @@ export function AdminQuestionsManager() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [modifiedQuestions, setModifiedQuestions] = useState<Set<string>>(new Set())
+  const [deletedQuestions, setDeletedQuestions] = useState<Set<string>>(new Set())
 
   const importQuestions = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -70,9 +72,35 @@ export function AdminQuestionsManager() {
 
     setIsSaving(true)
     try {
+      for (const questionId of deletedQuestions) {
+        await supabaseSync.deleteQuestion(questionId)
+      }
+
+      for (const questionId of modifiedQuestions) {
+        let foundQuestion: Question | null = null
+        for (const letter in questions) {
+          const question = questions[letter].find((q) => q.id === questionId)
+          if (question) {
+            foundQuestion = question
+            break
+          }
+        }
+
+        if (foundQuestion) {
+          await supabaseSync.updateQuestion(foundQuestion)
+        }
+      }
+
       const success = await supabaseSync.syncToSupabase(questions)
+
       if (success) {
+        setModifiedQuestions(new Set())
+        setDeletedQuestions(new Set())
         setHasUnsavedChanges(false)
+
+        localStorage.removeItem("modifiedQuestions")
+        localStorage.removeItem("deletedQuestions")
+
         alert("Todos los cambios han sido guardados en la base de datos")
       } else {
         alert("Error al guardar en la base de datos. Los cambios se mantienen localmente.")
@@ -95,25 +123,34 @@ export function AdminQuestionsManager() {
     const questionIndex = letterQuestions.findIndex((q) => q.id === updatedQuestion.id)
 
     if (questionIndex !== -1) {
+      const newModified = new Set(modifiedQuestions)
+      newModified.add(updatedQuestion.id)
+      setModifiedQuestions(newModified)
+
       letterQuestions[questionIndex] = updatedQuestion
       setQuestions(newQuestions)
       setEditingQuestion(null)
       setHasUnsavedChanges(true)
 
-      // Solo guardar localmente
       localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
+      localStorage.setItem("modifiedQuestions", JSON.stringify(Array.from(newModified)))
       alert("Pregunta actualizada. Presiona 'GUARDAR' para sincronizar con la base de datos.")
     }
   }
 
   const handleDeleteQuestion = (questionId: string, letter: string) => {
     if (confirm("¿Estás seguro de que quieres eliminar esta pregunta?")) {
+      const newDeleted = new Set(deletedQuestions)
+      newDeleted.add(questionId)
+      setDeletedQuestions(newDeleted)
+
       const newQuestions = { ...questions }
       newQuestions[letter] = newQuestions[letter].filter((q) => q.id !== questionId)
       setQuestions(newQuestions)
       setHasUnsavedChanges(true)
 
       localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
+      localStorage.setItem("deletedQuestions", JSON.stringify(Array.from(newDeleted)))
       alert("Pregunta eliminada. Presiona 'GUARDAR' para sincronizar con la base de datos.")
     }
   }
@@ -143,7 +180,6 @@ export function AdminQuestionsManager() {
     setEditingQuestion(null)
     setHasUnsavedChanges(true)
 
-    // Solo guardar localmente
     localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
     alert("Pregunta agregada. Presiona 'GUARDAR' para sincronizar con la base de datos.")
   }
@@ -203,19 +239,30 @@ export function AdminQuestionsManager() {
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        // Inicializar sincronización con Supabase
         await supabaseSync.initializeSync()
 
-        // Cargar datos desde localStorage (ya sincronizados)
         const savedQuestions = localStorage.getItem("questionsDatabase")
         if (savedQuestions) {
           setQuestions(JSON.parse(savedQuestions))
         }
 
-        // Cargar preguntas pendientes
         const savedPending = localStorage.getItem("pendingQuestions")
         if (savedPending) {
           setPendingQuestions(JSON.parse(savedPending))
+        }
+
+        const savedModified = localStorage.getItem("modifiedQuestions")
+        if (savedModified) {
+          setModifiedQuestions(new Set(JSON.parse(savedModified)))
+        }
+
+        const savedDeleted = localStorage.getItem("deletedQuestions")
+        if (savedDeleted) {
+          setDeletedQuestions(new Set(JSON.parse(savedDeleted)))
+        }
+
+        if (savedModified || savedDeleted) {
+          setHasUnsavedChanges(true)
         }
       } catch (error) {
         console.error("Error cargando preguntas:", error)

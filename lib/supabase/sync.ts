@@ -47,6 +47,63 @@ export class SupabaseSync {
     }
   }
 
+  async updateQuestion(question: Question): Promise<boolean> {
+    try {
+      // Primero eliminar la pregunta anterior si existe
+      await this.deleteQuestion(question.id)
+
+      // Luego insertar la versión actualizada
+      const { error } = await this.supabase.from("questions").insert({
+        letter: question.letter,
+        question: question.question,
+        answer: question.answer,
+        difficulty: question.difficulty,
+        category: question.category,
+      })
+
+      if (error) {
+        console.error("Error actualizando pregunta:", error)
+        return false
+      }
+
+      console.log(`Pregunta ${question.id} actualizada en Supabase`)
+      return true
+    } catch (error) {
+      console.error("Error en updateQuestion:", error)
+      return false
+    }
+  }
+
+  async deleteQuestion(questionId: string): Promise<boolean> {
+    try {
+      // Buscar la pregunta por question y answer ya que no tenemos el UUID de Supabase
+      const localData = localStorage.getItem("questionsArray")
+      if (!localData) return false
+
+      const questions: Question[] = JSON.parse(localData)
+      const questionToDelete = questions.find((q) => q.id === questionId)
+
+      if (!questionToDelete) return false
+
+      const { error } = await this.supabase
+        .from("questions")
+        .delete()
+        .eq("question", questionToDelete.question)
+        .eq("answer", questionToDelete.answer)
+
+      if (error) {
+        console.error("Error eliminando pregunta:", error)
+        return false
+      }
+
+      console.log(`Pregunta ${questionId} eliminada de Supabase`)
+      return true
+    } catch (error) {
+      console.error("Error en deleteQuestion:", error)
+      return false
+    }
+  }
+
   private loadLocalData(): void {
     const groupedQuestions = this.groupQuestionsByLetter(questionsDatabase)
     localStorage.setItem("questionsDatabase", JSON.stringify(groupedQuestions))
