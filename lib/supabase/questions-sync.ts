@@ -1,13 +1,16 @@
 import { supabase } from "./client"
 import type { Question } from "../game-types"
-import fs from "fs"
-import path from "path"
 
-const QUESTIONS_FILE_PATH = path.join(process.cwd(), "lib", "questions-from-supabase.json")
+// Browser-compatible version - uses localStorage instead of fs
+// and removes Node.js specific dependencies
 
 export async function downloadQuestionsFromSupabase(): Promise<Question[]> {
   try {
     console.log("Descargando preguntas desde Supabase...")
+
+    if (!supabase) {
+      throw new Error("Supabase client is not initialized.");
+    }
     
     const { data, error } = await supabase
       .from("questions")
@@ -42,68 +45,58 @@ export async function downloadQuestionsFromSupabase(): Promise<Question[]> {
   }
 }
 
-export async function saveQuestionsToLocalFile(questions: Question[]): Promise<void> {
+// Browser-compatible storage using localStorage
+export function saveQuestionsToLocalStorage(questions: Question[]): void {
   try {
-    // Crear el directorio si no existe
-    const dir = path.dirname(QUESTIONS_FILE_PATH)
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
+    if (typeof window !== "undefined") {
+      localStorage.setItem("questions-from-supabase", JSON.stringify(questions))
+      console.log("Preguntas guardadas en localStorage")
     }
-
-    // Guardar las preguntas en el archivo local
-    fs.writeFileSync(QUESTIONS_FILE_PATH, JSON.stringify(questions, null, 2))
-    console.log(`Preguntas guardadas en: ${QUESTIONS_FILE_PATH}`)
   } catch (error) {
-    console.error("Error guardando preguntas en archivo local:", error)
-    throw error
+    console.error("Error guardando preguntas en localStorage:", error)
   }
 }
 
-export function loadQuestionsFromLocalFile(): Question[] {
+export function loadQuestionsFromLocalStorage(): Question[] {
   try {
-    if (!fs.existsSync(QUESTIONS_FILE_PATH)) {
-      console.warn("Archivo de preguntas local no encontrado, usando preguntas por defecto")
-      return []
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("questions-from-supabase")
+      if (saved) {
+        return JSON.parse(saved) as Question[]
+      }
     }
-
-    const fileContent = fs.readFileSync(QUESTIONS_FILE_PATH, "utf-8")
-    const questions = JSON.parse(fileContent) as Question[]
-    console.log(`Preguntas cargadas desde archivo local: ${questions.length}`)
-    return questions
+    return []
   } catch (error) {
-    console.error("Error cargando preguntas desde archivo local:", error)
+    console.error("Error cargando preguntas desde localStorage:", error)
     return []
   }
 }
 
 export async function syncQuestionsOnce(): Promise<Question[]> {
   try {
-    // Verificar si ya existe el archivo local
-    if (fs.existsSync(QUESTIONS_FILE_PATH)) {
-      console.log("Archivo de preguntas local ya existe, cargando desde ahí...")
-      return loadQuestionsFromLocalFile()
+    // Check if we have questions in localStorage
+    const localQuestions = loadQuestionsFromLocalStorage()
+    
+    if (localQuestions.length > 0) {
+      console.log("Preguntas cargadas desde localStorage")
+      return localQuestions
     }
 
-    // Si no existe, descargar desde Supabase y guardar localmente
-    console.log("Primera vez sincronizando preguntas desde Supabase...")
+    // If no local questions, download from Supabase
+    console.log("Sincronizando preguntas desde Supabase...")
     const questions = await downloadQuestionsFromSupabase()
     
     if (questions.length > 0) {
-      await saveQuestionsToLocalFile(questions)
+      saveQuestionsToLocalStorage(questions)
     }
 
     return questions
   } catch (error) {
-    console.error("Error en sincronización única:", error)
+    console.error("Error en sincronización:", error)
     return []
   }
 }
 
-export function updateLocalQuestionsFile(questions: Question[]): void {
-  try {
-    saveQuestionsToLocalFile(questions)
-    console.log("Archivo local de preguntas actualizado")
-  } catch (error) {
-    console.error("Error actualizando archivo local:", error)
-  }
+export function updateLocalQuestions(questions: Question[]): void {
+  saveQuestionsToLocalStorage(questions)
 }

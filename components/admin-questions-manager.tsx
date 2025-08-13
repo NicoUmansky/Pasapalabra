@@ -13,7 +13,7 @@ import { Trash2, Edit, Plus, X, Upload, Download, Check, Clock, ArrowLeft, BookO
 import type { Question, Difficulty } from "@/lib/game-types"
 import { questionsDatabase, updateLocalQuestions, getCurrentQuestions, getQuestionsByLetter } from "@/lib/questions-data"
 import { createClient } from "@/lib/supabase/client"
-import { updateLocalQuestionsFile, loadQuestionsFromLocalFile } from "@/lib/supabase/questions-sync"
+import { loadQuestionsFromLocalStorage } from "@/lib/supabase/questions-sync"
 
 interface PendingQuestion extends Question {
   id: string
@@ -59,7 +59,7 @@ export function AdminQuestionsManager() {
       const questionsArray = Object.values(questionsData).flat()
       
       // Actualizar el archivo local primero
-      updateLocalQuestionsFile(questionsArray)
+      updateLocalQuestions(questionsArray)
       
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
         console.warn("Supabase no configurado, guardando solo en archivo local")
@@ -101,7 +101,7 @@ export function AdminQuestionsManager() {
         let currentQuestions = questionsDatabase
         
         try {
-          const localQuestions = loadQuestionsFromLocalFile()
+          const localQuestions = loadQuestionsFromLocalStorage()
           if (localQuestions.length > 0) {
             currentQuestions = localQuestions
             console.log("Preguntas cargadas desde archivo local:", localQuestions.length)
@@ -303,8 +303,8 @@ export function AdminQuestionsManager() {
 
   const reloadQuestions = async () => {
     try {
-      // Recargar preguntas desde el archivo local
-      const localQuestions = loadQuestionsFromLocalFile()
+      // Recargar preguntas desde el archivo local (NO desde Supabase)
+      const localQuestions = loadQuestionsFromLocalStorage()
       if (localQuestions.length > 0) {
         const groupedQuestions: Record<string, Question[]> = {}
         
@@ -318,7 +318,7 @@ export function AdminQuestionsManager() {
         
         setQuestions(groupedQuestions)
         console.log("Preguntas recargadas desde archivo local:", localQuestions.length)
-        alert("Preguntas actualizadas desde la base de datos")
+        alert("Preguntas actualizadas desde el archivo local")
       } else {
         alert("No se encontraron preguntas en el archivo local")
       }
