@@ -8,7 +8,7 @@ export async function syncQuestionsToSupabase() {
     const questionsArray: Question[] = []
 
     Object.entries(questionsDatabase).forEach(([letter, questions]) => {
-      questions.forEach((q) => {
+      (Array.isArray(questions) ? questions : [questions]).forEach((q) => {
         questionsArray.push({
           letter,
           question: q.question,
@@ -20,6 +20,10 @@ export async function syncQuestionsToSupabase() {
     })
 
     // Insertar preguntas en Supabase (ignorar duplicados)
+    if (!supabase) {
+      console.error("Supabase client is not initialized.")
+      return false
+    }
     const { error } = await supabase.from("questions").upsert(questionsArray, {
       onConflict: "letter,question",
       ignoreDuplicates: true,
@@ -39,6 +43,10 @@ export async function syncQuestionsToSupabase() {
 
 export async function saveQuestionToSupabase(question: Question) {
   try {
+    if (!supabase) {
+      console.error("Supabase client is not initialized.")
+      return false
+    }
     const { error } = await supabase.from("questions").upsert([question], { onConflict: "letter,question" })
 
     if (error) {
@@ -55,6 +63,10 @@ export async function saveQuestionToSupabase(question: Question) {
 
 export async function deleteQuestionFromSupabase(id: string) {
   try {
+    if (!supabase) {
+      console.error("Supabase client is not initialized.")
+      return false
+    }
     const { error } = await supabase.from("questions").delete().eq("id", id)
 
     if (error) {
@@ -71,6 +83,10 @@ export async function deleteQuestionFromSupabase(id: string) {
 
 export async function loadQuestionsFromSupabase() {
   try {
+    if (!supabase) {
+      console.error("Supabase client is not initialized.")
+      return null
+    }
     const { data, error } = await supabase.from("questions").select("*").order("letter", { ascending: true })
 
     if (error) {
