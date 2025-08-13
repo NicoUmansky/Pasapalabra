@@ -23,7 +23,6 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
   const [inputValue, setInputValue] = useState("")
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false)
   const [lastResult, setLastResult] = useState<"correct" | "incorrect" | null>(null)
-  const [voicePasapalabra, setVoicePasapalabra] = useState(false)
 
   const {
     isListening,
@@ -38,18 +37,6 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
     interimResults: true,
     onResult: (result) => {
       console.log("Speech result:", result)
-      
-      // Si se detectó "pasapalabra", ejecutar esa acción
-      if (result.isPasapalabra) {
-        console.log("Pasapalabra detectado por voz")
-        setVoicePasapalabra(true)
-        setTimeout(() => {
-          setVoicePasapalabra(false)
-          onPassapalabra()
-        }, 1000)
-        return
-      }
-      
       if (result.isFinal && result.transcript.trim()) {
         setInputValue(result.transcript.trim())
         handleSubmit(result.transcript.trim())
@@ -57,16 +44,6 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
     },
     onError: (error) => {
       console.error("Speech recognition error:", error)
-      
-      // Mostrar error al usuario de manera amigable
-      if (error.includes('Permiso de micrófono')) {
-        alert("🔇 Error de micrófono: " + error + "\n\nPara solucionarlo:\n1. Toca el ícono del micrófono\n2. Permite el acceso al micrófono\n3. Recarga la página si es necesario")
-      } else if (error.includes('No se detectó voz')) {
-        // No mostrar alerta para este error, es muy común
-        console.log("No se detectó voz, continuando...")
-      } else {
-        alert("⚠️ Error de reconocimiento de voz: " + error)
-      }
     },
   })
 
@@ -76,7 +53,6 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
     }
   }, [transcript])
 
-  // Efecto para limpiar cuando cambie la pregunta
   useEffect(() => {
     setInputValue("")
     setShowCorrectAnswer(false)
@@ -85,7 +61,7 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
     if (isListening) {
       stopListening()
     }
-  }, [question.id, resetTranscript, isListening, stopListening])
+  }, [question, resetTranscript, isListening, stopListening])
 
   const normalizeText = (text: string) => {
     return text
@@ -243,11 +219,10 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
                 }}
                 className="flex-1 text-xs sm:text-sm lg:text-base py-2 sm:py-3 min-w-0"
                 style={{
-                  wordBreak: "break-word",
-                  overflowWrap: "break-word",
-                  whiteSpace: "normal",
-                  minHeight: "auto",
-                  resize: "none"
+                  wordBreak: "normal",
+                  overflowWrap: "anywhere",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
                 }}
               />
 
@@ -269,21 +244,10 @@ export function ResponseInput({ question, onAnswer, onPassapalabra, disabled, sh
             </div>
 
             {isListening && (
-              <div className="text-center space-y-2">
+              <div className="text-center">
                 <Badge variant="outline" className="animate-pulse text-xs sm:text-sm">
                   <Volume2 className="h-3 w-3 mr-1" />
                   Escuchando...
-                </Badge>
-                <div className="text-xs text-gray-500">
-                  💡 Di "pasapalabra" para saltar la pregunta
-                </div>
-              </div>
-            )}
-
-            {voicePasapalabra && (
-              <div className="text-center">
-                <Badge variant="default" className="bg-blue-500 animate-pulse text-xs sm:text-sm">
-                  🎤 ¡Pasapalabra detectado por voz!
                 </Badge>
               </div>
             )}

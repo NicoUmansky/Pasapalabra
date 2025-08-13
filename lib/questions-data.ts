@@ -1,8 +1,13 @@
-import type { Question } from "./game-types"
-import { syncQuestionsOnce, loadQuestionsFromLocalStorage, updateLocalQuestions } from "./supabase/questions-sync"
+export interface Question {
+  id: string
+  letter: string
+  question: string
+  answer: string
+  difficulty: "facil" | "medio" | "dificil"
+  category?: string
+}
 
-// Preguntas por defecto (solo se usan si no hay archivo local ni conexión a Supabase)
-const defaultQuestions: Question[] = [
+export const questionsDatabase: Question[] = [
   // Agregando todas las preguntas con las difíciles incluidas
   {
     id: "a1",
@@ -854,48 +859,7 @@ const defaultQuestions: Question[] = [
   },
 ]
 
-// Función para cargar preguntas desde el archivo local o sincronizar desde Supabase
-async function loadQuestionsFromStorage(): Promise<Question[]> {
-  try {
-    // Primero intentar cargar desde el almacenamiento local (localStorage o archivo)
-    const localQuestions = loadQuestionsFromLocalStorage()
-    
-    if (localQuestions && localQuestions.length > 0) {
-      console.log("Preguntas cargadas desde almacenamiento local")
-      return localQuestions
-    }
-    }
-
-    // Si no hay archivo local, intentar sincronizar desde Supabase
-    console.log("Sincronizando preguntas desde Supabase...")
-    const syncedQuestions = await syncQuestionsOnce()
-    
-    if (syncedQuestions.length > 0) {
-      console.log("Preguntas sincronizadas desde Supabase")
-      return syncedQuestions
-    }
-
-    // Si no hay conexión a Supabase, usar las preguntas por defecto
-    console.log("Usando preguntas por defecto")
-    return defaultQuestions
-  } catch (error) {
-    console.error("Error cargando preguntas:", error)
-    return defaultQuestions
-  }
-}
-
-// Función para actualizar las preguntas en el archivo local
-export function updateLocalQuestions(questions: Question[]): void {
-  updateLocalQuestionsFile(questions)
-}
-
-// Función para obtener todas las preguntas actuales
-export async function getCurrentQuestions(): Promise<Question[]> {
-  return await loadQuestionsFromStorage()
-}
-
-// Función para cargar preguntas desde localStorage (para compatibilidad)
-function loadQuestionsFromLocalStorage(): Question[] {
+function loadQuestionsFromStorage(): Question[] {
   if (typeof window !== "undefined") {
     const saved = localStorage.getItem("questionsArray")
     if (saved) {
@@ -906,35 +870,32 @@ function loadQuestionsFromLocalStorage(): Question[] {
       }
     }
   }
-  return defaultQuestions
+  return questionsDatabase
 }
 
-// Inicializar las preguntas
-let currentQuestions: Question[] = defaultQuestions
+const currentQuestions = loadQuestionsFromStorage()
 
-// Función para inicializar las preguntas (llamar al inicio de la aplicación)
-export async function initializeQuestions(): Promise<void> {
-  currentQuestions = await loadQuestionsFromStorage()
-}
+export const questionsData: Record<string, Question[]> = {}
 
-// Función para obtener las preguntas agrupadas por letra
-export function getQuestionsByLetter(): Record<string, Question[]> {
-  const questionsData: Record<string, Question[]> = {}
+currentQuestions.forEach((question) => {
+  if (!questionsData[question.letter]) {
+    questionsData[question.letter] = []
+  }
+  questionsData[question.letter].push(question)
+})
 
-  currentQuestions.forEach((question) => {
-    if (!questionsData[question.letter]) {
-      questionsData[question.letter] = []
+export function getRandomQuestion(letter: string, difficulty: "facil" | "medio" | "dificil"): Question | null {
+  const updatedQuestions = loadQuestionsFromStorage()
+  const updatedQuestionsData: Record<string, Question[]> = {}
+
+  updatedQuestions.forEach((question) => {
+    if (!updatedQuestionsData[question.letter]) {
+      updatedQuestionsData[question.letter] = []
     }
-    questionsData[question.letter].push(question)
+    updatedQuestionsData[question.letter].push(question)
   })
 
-  return questionsData
-}
-
-// Función para obtener una pregunta aleatoria
-export function getRandomQuestion(letter: string, difficulty: "facil" | "medio" | "dificil"): Question | null {
-  const questionsData = getQuestionsByLetter()
-  const letterQuestions = questionsData[letter] || []
+  const letterQuestions = updatedQuestionsData[letter] || []
   const filteredQuestions = letterQuestions.filter((q) => q.difficulty === difficulty)
 
   if (filteredQuestions.length === 0) {
@@ -947,13 +908,6 @@ export function getRandomQuestion(letter: string, difficulty: "facil" | "medio" 
   return filteredQuestions[Math.floor(Math.random() * filteredQuestions.length)]
 }
 
-// Función para obtener todas las letras disponibles
 export function getAllLetters(): string[] {
   return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 }
-
-// Exportar las preguntas por defecto para compatibilidad
-export const questionsDatabase = defaultQuestions
-
-// Exportar las preguntas actuales
-export const questionsData = getQuestionsByLetter()

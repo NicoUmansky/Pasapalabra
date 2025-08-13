@@ -9,11 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Edit, Plus, X, Upload, Download, Check, Clock, ArrowLeft, BookOpen, RefreshCw } from "lucide-react"
+import { Trash2, Edit, Plus, X, Upload, Download, Check, Clock, ArrowLeft, BookOpen } from "lucide-react"
 import type { Question, Difficulty } from "@/lib/game-types"
-import { questionsDatabase, updateLocalQuestions, getCurrentQuestions, getQuestionsByLetter } from "@/lib/questions-data"
+import { questionsDatabase } from "@/lib/questions-data"
 import { createClient } from "@/lib/supabase/client"
-import { loadQuestionsFromLocalStorage } from "@/lib/supabase/questions-sync"
 
 interface PendingQuestion extends Question {
   id: string
@@ -31,89 +30,6 @@ export function AdminQuestionsManager() {
   const [activeTab, setActiveTab] = useState<"questions" | "pending">("questions")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const loadQuestionsFromSupabase = async () => {
-    try {
-      const supabase = createClient()
-      const { data, error } = await supabase.from("questions").select("*").order("letter", { ascending: true })
-
-      if (error) {
-        console.error("Error cargando desde Supabase:", error)
-        return
-      }
-
-      if (data && data.length > 0) {
-        // Convertir datos de Supabase al formato esperado
-        const supabaseQuestions = data.map((item) => ({
-          id: item.game_id || `${item.letter.toLowerCase()}${Math.random()}`,
-          letter: item.letter,
-          question: item.question,
-          answer: item.answer,
-          difficulty: item.difficulty,
-          category: item.category,
-        }))
-
-        // Agrupar por letra
-        const groupedQuestions: Record<string, Question[]> = {}
-        supabaseQuestions.forEach((question) => {
-          const letter = question.letter.toUpperCase()
-          if (!groupedQuestions[letter]) {
-            groupedQuestions[letter] = []
-          }
-          groupedQuestions[letter].push(question)
-        })
-
-        setQuestions(groupedQuestions)
-
-        // Sincronizar con localStorage para el juego
-        localStorage.setItem("questionsArray", JSON.stringify(supabaseQuestions))
-
-        // También actualizar el formato agrupado
-        const questionsObj: Record<string, Question[]> = {}
-        supabaseQuestions.forEach((q) => {
-          if (!questionsObj[q.letter]) questionsObj[q.letter] = []
-          questionsObj[q.letter].push(q)
-        })
-        localStorage.setItem("questionsDatabase", JSON.stringify(questionsObj))
-      }
-    } catch (error) {
-      console.error("Error conectando con Supabase:", error)
-    }
-  }
-
-  const exportQuestionsFromSupabase = async () => {
-    try {
-      const supabase = createClient()
-      const { data, error } = await supabase.from("questions").select("*").order("letter", { ascending: true })
-
-      if (error) {
-        console.error("Error exportando desde Supabase:", error)
-        return
-      }
-
-      if (data) {
-        // Convertir al formato del juego
-        const exportData = data.map((item) => ({
-          id: item.game_id || `${item.letter.toLowerCase()}${Math.random()}`,
-          letter: item.letter,
-          question: item.question,
-          answer: item.answer,
-          difficulty: item.difficulty,
-          category: item.category,
-        }))
-
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2))
-        const downloadAnchorNode = document.createElement("a")
-        downloadAnchorNode.setAttribute("href", dataStr)
-        downloadAnchorNode.setAttribute("download", "questions-supabase.json")
-        document.body.appendChild(downloadAnchorNode)
-        downloadAnchorNode.click()
-        downloadAnchorNode.remove()
-      }
-    } catch (error) {
-      console.error("Error exportando:", error)
-    }
-  }
-
   const importQuestions = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -127,23 +43,25 @@ export function AdminQuestionsManager() {
     }
   }
 
-  const exportQuestions = async () => {
-    await exportQuestionsFromSupabase()
+  const exportQuestions = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions))
+    const downloadAnchorNode = document.createElement("a")
+    downloadAnchorNode.setAttribute("href", dataStr)
+    downloadAnchorNode.setAttribute("download", "questions.json")
+    document.body.appendChild(downloadAnchorNode)
+    downloadAnchorNode.click()
+    downloadAnchorNode.remove()
   }
 
   const saveToSupabase = async (questionsData: Record<string, Question[]>) => {
     try {
-      const questionsArray = Object.values(questionsData).flat()
-      
-      // Actualizar el archivo local primero
-      updateLocalQuestions(questionsArray)
-      
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.warn("Supabase no configurado, guardando solo en archivo local")
+        console.warn("Supabase no configurado, guardando solo en localStorage")
         return true
       }
 
       const supabase = createClient()
+      const questionsArray = Object.values(questionsData).flat()
 
       // Eliminar todas las preguntas existentes
       await supabase.from("questions").delete().neq("id", "")
@@ -174,52 +92,18 @@ export function AdminQuestionsManager() {
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-<<<<<<< HEAD
-        // Intentar cargar preguntas desde el archivo local más reciente
-        let currentQuestions = questionsDatabase
-        
-        try {
-          const localQuestions = loadQuestionsFromLocalStorage()
-          if (localQuestions.length > 0) {
-            currentQuestions = localQuestions
-            console.log("Preguntas cargadas desde archivo local:", localQuestions.length)
-          } else {
-            console.log("Usando preguntas por defecto")
-          }
-        } catch (error) {
-          console.log("Error cargando archivo local, usando preguntas por defecto:", error)
-        }
-
         // Convertir el array de preguntas a objeto agrupado por letra
         const groupedQuestions: Record<string, Question[]> = {}
 
-        currentQuestions.forEach((question) => {
+        questionsDatabase.forEach((question) => {
           const letter = question.letter.toUpperCase()
           if (!groupedQuestions[letter]) {
             groupedQuestions[letter] = []
           }
           groupedQuestions[letter].push(question)
         })
-=======
-        await loadQuestionsFromSupabase()
 
-        // Si no hay datos en Supabase, usar datos locales como fallback
-        const currentQuestions = Object.keys(questions).length
-        if (currentQuestions === 0) {
-          // Convertir el array de preguntas a objeto agrupado por letra
-          const groupedQuestions: Record<string, Question[]> = {}
->>>>>>> parent of 0d76268 (Revert "feat: integrate Supabase as primary question source")
-
-          questionsDatabase.forEach((question) => {
-            const letter = question.letter.toUpperCase()
-            if (!groupedQuestions[letter]) {
-              groupedQuestions[letter] = []
-            }
-            groupedQuestions[letter].push(question)
-          })
-
-          setQuestions(groupedQuestions)
-        }
+        setQuestions(groupedQuestions)
 
         // Cargar preguntas pendientes desde localStorage
         const savedPending = localStorage.getItem("pendingQuestions")
@@ -295,9 +179,9 @@ export function AdminQuestionsManager() {
     }
   }
 
-  const validateQuestion = (question: Question | null): string | null => {
-    if (!question?.question?.trim()) return "La pregunta es requerida"
-    if (!question?.answer?.trim()) return "La respuesta es requerida"
+  const validateQuestion = (question: Partial<Question>): string | null => {
+    if (!question.question?.trim()) return "La pregunta es requerida"
+    if (!question.answer?.trim()) return "La respuesta es requerida"
 
     // Validar que la respuesta empiece con la letra correcta
     const firstLetter = question.answer.trim().charAt(0).toUpperCase()
@@ -309,8 +193,6 @@ export function AdminQuestionsManager() {
   }
 
   const saveQuestion = async () => {
-    if (!editingQuestion) return
-    
     const validation = validateQuestion(editingQuestion)
     if (validation) {
       alert(validation)
@@ -318,10 +200,10 @@ export function AdminQuestionsManager() {
     }
 
     const questionToSave: Question = {
-      question: editingQuestion.question.trim(),
-      answer: editingQuestion.answer.trim(),
-      difficulty: editingQuestion.difficulty,
-      category: editingQuestion.category || "general",
+      question: editingQuestion?.question!.trim(),
+      answer: editingQuestion?.answer!.trim(),
+      difficulty: editingQuestion?.difficulty as Difficulty,
+      category: editingQuestion?.category || "general",
       letter: selectedLetter,
       id: Date.now().toString(),
     }
@@ -397,33 +279,6 @@ export function AdminQuestionsManager() {
     // Implement close logic here
   }
 
-  const reloadQuestions = async () => {
-    try {
-      // Recargar preguntas desde el archivo local (NO desde Supabase)
-      const localQuestions = loadQuestionsFromLocalStorage()
-      if (localQuestions.length > 0) {
-        const groupedQuestions: Record<string, Question[]> = {}
-        
-        localQuestions.forEach((question) => {
-          const letter = question.letter.toUpperCase()
-          if (!groupedQuestions[letter]) {
-            groupedQuestions[letter] = []
-          }
-          groupedQuestions[letter].push(question)
-        })
-        
-        setQuestions(groupedQuestions)
-        console.log("Preguntas recargadas desde archivo local:", localQuestions.length)
-        alert("Preguntas actualizadas desde el archivo local")
-      } else {
-        alert("No se encontraron preguntas en el archivo local")
-      }
-    } catch (error) {
-      console.error("Error recargando preguntas:", error)
-      alert("Error al recargar las preguntas")
-    }
-  }
-
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
@@ -468,7 +323,7 @@ export function AdminQuestionsManager() {
                 className="w-full sm:w-64"
               />
 
-              <Select value={selectedDifficulty} onValueChange={(value: Difficulty | "all") => setSelectedDifficulty(value)}>
+              <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
@@ -507,10 +362,6 @@ export function AdminQuestionsManager() {
               <Button variant="outline" onClick={exportQuestions} className="w-full sm:w-auto bg-transparent">
                 <Download className="w-4 h-4 mr-2" />
                 Exportar
-              </Button>
-              <Button variant="outline" onClick={reloadQuestions} className="w-full sm:w-auto bg-transparent">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Actualizar
               </Button>
             </div>
           </div>
