@@ -69,7 +69,7 @@ export function GameSettings({ settings, onSave, onClose, onAdvanced }: GameSett
             </Label>
             <Select
               value={localSettings.difficulty}
-              onValueChange={(value: "facil" | "medio" | "dificil") =>
+              onValueChange={(value: "facil" | "medio" | "dificil" | "sorpresa") =>
                 setLocalSettings((prev) => ({ ...prev, difficulty: value }))
               }
             >
@@ -80,6 +80,7 @@ export function GameSettings({ settings, onSave, onClose, onAdvanced }: GameSett
                 <SelectItem value="facil">Fácil</SelectItem>
                 <SelectItem value="medio">Medio</SelectItem>
                 <SelectItem value="dificil">Difícil</SelectItem>
+                <SelectItem value="sorpresa">⭐ Sorpresa</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -90,10 +91,10 @@ export function GameSettings({ settings, onSave, onClose, onAdvanced }: GameSett
             </Label>
             <Select
               value={
-                localSettings.responseMode === "text" || localSettings.responseMode === "voice" ? "input" : "buttons"
+                localSettings.responseMode === "input" || localSettings.responseMode === "voice" ? "input" : "buttons"
               }
               onValueChange={(value: "buttons" | "input") =>
-                setLocalSettings((prev) => ({ ...prev, responseMode: value === "input" ? "text" : "buttons" }))
+                setLocalSettings((prev) => ({ ...prev, responseMode: value === "input" ? "input" : "buttons" }))
               }
             >
               <SelectTrigger className="mt-1">

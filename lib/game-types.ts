@@ -1,4 +1,4 @@
-export type GameDifficulty = "facil" | "medio" | "dificil"
+export type GameDifficulty = "facil" | "medio" | "dificil" | "sorpresa"
 export type GameMode = "individual" | "multijugador"
 export type LetterStatus = "pending" | "correct" | "incorrect" | "skipped"
 export type ResponseMode = "buttons" | "visible" | "input" | "voice"

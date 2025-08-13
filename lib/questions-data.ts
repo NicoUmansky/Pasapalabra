@@ -886,7 +886,10 @@ currentQuestions.forEach((question) => {
   questionsData[question.letter].push(question)
 })
 
-export function getRandomQuestion(letter: string, difficulty: "facil" | "medio" | "dificil"): Question | null {
+export function getRandomQuestion(
+  letter: string,
+  difficulty: "facil" | "medio" | "dificil" | "sorpresa",
+): Question | null {
   const updatedQuestions = loadQuestionsFromStorage()
   const updatedQuestionsData: Record<string, Question[]> = {}
 
@@ -898,6 +901,12 @@ export function getRandomQuestion(letter: string, difficulty: "facil" | "medio" 
   })
 
   const letterQuestions = updatedQuestionsData[letter] || []
+
+  if (difficulty === "sorpresa") {
+    if (letterQuestions.length === 0) return null
+    return letterQuestions[Math.floor(Math.random() * letterQuestions.length)]
+  }
+
   const filteredQuestions = letterQuestions.filter((q) => q.difficulty === difficulty)
 
   if (filteredQuestions.length === 0) {

@@ -96,6 +96,26 @@ export function AdvancedSettings({ settings, onSave, onClose, onReset, onExport,
                 </div>
 
                 <div>
+                  <Label htmlFor="difficulty">Nivel de Dificultad</Label>
+                  <Select
+                    value={localSettings.difficulty}
+                    onValueChange={(value: "facil" | "medio" | "dificil" | "sorpresa") =>
+                      updateSetting("difficulty", value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="facil">Fácil</SelectItem>
+                      <SelectItem value="medio">Medio</SelectItem>
+                      <SelectItem value="dificil">Difícil</SelectItem>
+                      <SelectItem value="sorpresa">⭐ Sorpresa</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
                   <DifficultySelector
                     value={localSettings.difficulty}
                     onChange={(difficulty) => updateSetting("difficulty", difficulty)}
