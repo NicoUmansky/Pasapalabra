@@ -11,8 +11,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Trash2, Edit, Plus, X, Upload, Download, Check, Clock, ArrowLeft, BookOpen } from "lucide-react"
 import type { Question, Difficulty } from "@/lib/game-types"
-import { questionsDatabase } from "@/lib/questions-data"
-import { createClient } from "@/lib/supabase/client"
+import { supabaseSync } from "@/lib/supabase/sync"
+import { validateQuestion } from "@/lib/validation" // Import the validateQuestion function
 
 interface PendingQuestion extends Question {
   id: string
@@ -29,6 +29,8 @@ export function AdminQuestionsManager() {
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
   const [activeTab, setActiveTab] = useState<"questions" | "pending">("questions")
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   const importQuestions = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -38,96 +40,50 @@ export function AdminQuestionsManager() {
         const questionsData = JSON.parse(e.target?.result as string)
         setQuestions(questionsData)
         localStorage.setItem("questionsDatabase", JSON.stringify(questionsData))
+        setHasUnsavedChanges(true)
       }
       reader.readAsText(file)
     }
   }
 
-  const exportQuestions = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions))
-    const downloadAnchorNode = document.createElement("a")
-    downloadAnchorNode.setAttribute("href", dataStr)
-    downloadAnchorNode.setAttribute("download", "questions.json")
-    document.body.appendChild(downloadAnchorNode)
-    downloadAnchorNode.click()
-    downloadAnchorNode.remove()
-  }
-
-  const saveToSupabase = async (questionsData: Record<string, Question[]>) => {
+  const exportQuestions = async () => {
     try {
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.warn("Supabase no configurado, guardando solo en localStorage")
-        return true
-      }
-
-      const supabase = createClient()
-      const questionsArray = Object.values(questionsData).flat()
-
-      // Eliminar todas las preguntas existentes
-      await supabase.from("questions").delete().neq("id", "")
-
-      // Insertar las nuevas preguntas
-      const { error } = await supabase.from("questions").insert(
-        questionsArray.map((q) => ({
-          letter: q.letter,
-          question: q.question,
-          answer: q.answer,
-          difficulty: q.difficulty,
-          category: q.category,
-        })),
-      )
-
-      if (error) {
-        console.error("Error guardando en Supabase:", error)
-        return false
-      }
-
-      return true
+      const allQuestions = await supabaseSync.exportAllQuestions()
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allQuestions))
+      const downloadAnchorNode = document.createElement("a")
+      downloadAnchorNode.setAttribute("href", dataStr)
+      downloadAnchorNode.setAttribute("download", "questions-supabase.json")
+      document.body.appendChild(downloadAnchorNode)
+      downloadAnchorNode.click()
+      downloadAnchorNode.remove()
     } catch (error) {
-      console.error("Error conectando con Supabase:", error)
-      return true
+      console.error("Error exportando:", error)
+      alert("Error al exportar las preguntas")
     }
   }
 
-  useEffect(() => {
-    const loadQuestions = async () => {
-      try {
-        // Convertir el array de preguntas a objeto agrupado por letra
-        const groupedQuestions: Record<string, Question[]> = {}
-
-        questionsDatabase.forEach((question) => {
-          const letter = question.letter.toUpperCase()
-          if (!groupedQuestions[letter]) {
-            groupedQuestions[letter] = []
-          }
-          groupedQuestions[letter].push(question)
-        })
-
-        setQuestions(groupedQuestions)
-
-        // Cargar preguntas pendientes desde localStorage
-        const savedPending = localStorage.getItem("pendingQuestions")
-        if (savedPending) {
-          setPendingQuestions(JSON.parse(savedPending))
-        }
-      } catch (error) {
-        console.error("Error cargando preguntas:", error)
-      }
+  const saveAllChanges = async () => {
+    if (!hasUnsavedChanges) {
+      alert("No hay cambios para guardar")
+      return
     }
 
-    loadQuestions()
-  }, [])
-
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
-
-  const filteredQuestions =
-    questions[selectedLetter]?.filter((q) => {
-      const matchesSearch =
-        q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        q.answer.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesDifficulty = selectedDifficulty === "all" || q.difficulty === selectedDifficulty
-      return matchesSearch && matchesDifficulty
-    }) || []
+    setIsSaving(true)
+    try {
+      const success = await supabaseSync.syncToSupabase(questions)
+      if (success) {
+        setHasUnsavedChanges(false)
+        alert("Todos los cambios han sido guardados en la base de datos")
+      } else {
+        alert("Error al guardar en la base de datos. Los cambios se mantienen localmente.")
+      }
+    } catch (error) {
+      console.error("Error guardando cambios:", error)
+      alert("Error al guardar los cambios")
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   const handleEditQuestion = (question: Question) => {
     setEditingQuestion(question)
@@ -142,22 +98,11 @@ export function AdminQuestionsManager() {
       letterQuestions[questionIndex] = updatedQuestion
       setQuestions(newQuestions)
       setEditingQuestion(null)
+      setHasUnsavedChanges(true)
 
+      // Solo guardar localmente
       localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
-
-      const saved = await saveToSupabase(newQuestions)
-
-      // Sincronizar con el objeto questionsData global
-      if (typeof window !== "undefined") {
-        const questionsArray = Object.values(newQuestions).flat()
-        localStorage.setItem("questionsArray", JSON.stringify(questionsArray))
-      }
-
-      alert(
-        saved
-          ? "Pregunta actualizada y guardada en la base de datos"
-          : "Pregunta actualizada localmente (error en base de datos)",
-      )
+      alert("Pregunta actualizada. Presiona 'GUARDAR' para sincronizar con la base de datos.")
     }
   }
 
@@ -166,30 +111,11 @@ export function AdminQuestionsManager() {
       const newQuestions = { ...questions }
       newQuestions[letter] = newQuestions[letter].filter((q) => q.id !== questionId)
       setQuestions(newQuestions)
+      setHasUnsavedChanges(true)
 
       localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
-
-      // Sincronizar con el objeto questionsData global
-      if (typeof window !== "undefined") {
-        const questionsArray = Object.values(newQuestions).flat()
-        localStorage.setItem("questionsArray", JSON.stringify(questionsArray))
-      }
-
-      alert("Pregunta eliminada exitosamente")
+      alert("Pregunta eliminada. Presiona 'GUARDAR' para sincronizar con la base de datos.")
     }
-  }
-
-  const validateQuestion = (question: Partial<Question>): string | null => {
-    if (!question.question?.trim()) return "La pregunta es requerida"
-    if (!question.answer?.trim()) return "La respuesta es requerida"
-
-    // Validar que la respuesta empiece con la letra correcta
-    const firstLetter = question.answer.trim().charAt(0).toUpperCase()
-    if (firstLetter !== selectedLetter) {
-      return `La respuesta debe empezar con la letra ${selectedLetter}`
-    }
-
-    return null
   }
 
   const saveQuestion = async () => {
@@ -215,18 +141,11 @@ export function AdminQuestionsManager() {
 
     setQuestions(newQuestions)
     setEditingQuestion(null)
+    setHasUnsavedChanges(true)
 
+    // Solo guardar localmente
     localStorage.setItem("questionsDatabase", JSON.stringify(newQuestions))
-
-    const saved = await saveToSupabase(newQuestions)
-
-    // Sincronizar con el objeto questionsData global
-    if (typeof window !== "undefined") {
-      const questionsArray = Object.values(newQuestions).flat()
-      localStorage.setItem("questionsArray", JSON.stringify(questionsArray))
-    }
-
-    alert(saved ? "Pregunta guardada en la base de datos" : "Pregunta guardada localmente (error en base de datos)")
+    alert("Pregunta agregada. Presiona 'GUARDAR' para sincronizar con la base de datos.")
   }
 
   const approvePendingQuestion = (pendingQuestion: PendingQuestion) => {
@@ -252,6 +171,7 @@ export function AdminQuestionsManager() {
       "pendingQuestions",
       JSON.stringify(pendingQuestions.filter((q) => q.id !== pendingQuestion.id)),
     )
+    setHasUnsavedChanges(true)
   }
 
   const rejectPendingQuestion = (pendingQuestion: PendingQuestion) => {
@@ -260,6 +180,7 @@ export function AdminQuestionsManager() {
       "pendingQuestions",
       JSON.stringify(pendingQuestions.filter((q) => q.id !== pendingQuestion.id)),
     )
+    setHasUnsavedChanges(true)
   }
 
   const getDifficultyColor = (difficulty: Difficulty) => {
@@ -279,6 +200,42 @@ export function AdminQuestionsManager() {
     // Implement close logic here
   }
 
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        // Inicializar sincronización con Supabase
+        await supabaseSync.initializeSync()
+
+        // Cargar datos desde localStorage (ya sincronizados)
+        const savedQuestions = localStorage.getItem("questionsDatabase")
+        if (savedQuestions) {
+          setQuestions(JSON.parse(savedQuestions))
+        }
+
+        // Cargar preguntas pendientes
+        const savedPending = localStorage.getItem("pendingQuestions")
+        if (savedPending) {
+          setPendingQuestions(JSON.parse(savedPending))
+        }
+      } catch (error) {
+        console.error("Error cargando preguntas:", error)
+      }
+    }
+
+    loadQuestions()
+  }, [])
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+
+  const filteredQuestions =
+    questions[selectedLetter]?.filter((q) => {
+      const matchesSearch =
+        q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        q.answer.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesDifficulty = selectedDifficulty === "all" || q.difficulty === selectedDifficulty
+      return matchesSearch && matchesDifficulty
+    }) || []
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
@@ -286,8 +243,20 @@ export function AdminQuestionsManager() {
           <div className="flex items-center gap-3">
             <BookOpen className="w-6 h-6 text-blue-600" />
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Gestor de Preguntas - Admin</h2>
+            {hasUnsavedChanges && (
+              <Badge variant="outline" className="bg-orange-100 text-orange-800">
+                Cambios sin guardar
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              onClick={saveAllChanges}
+              disabled={!hasUnsavedChanges || isSaving}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold"
+            >
+              {isSaving ? "Guardando..." : "GUARDAR"}
+            </Button>
             <Link href="/">
               <Button variant="outline" size="sm" className="flex items-center gap-2 bg-transparent">
                 <ArrowLeft className="w-4 h-4" />

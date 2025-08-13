@@ -859,6 +859,8 @@ export const questionsDatabase: Question[] = [
   },
 ]
 
+import { supabaseSync } from "./supabase/sync"
+
 function loadQuestionsFromStorage(): Question[] {
   if (typeof window !== "undefined") {
     const saved = localStorage.getItem("questionsArray")
@@ -906,6 +908,14 @@ export function getRandomQuestion(letter: string, difficulty: "facil" | "medio" 
   }
 
   return filteredQuestions[Math.floor(Math.random() * filteredQuestions.length)]
+}
+
+export async function initializeQuestions(): Promise<void> {
+  try {
+    await supabaseSync.initializeSync()
+  } catch (error) {
+    console.error("Error inicializando preguntas:", error)
+  }
 }
 
 export function getAllLetters(): string[] {

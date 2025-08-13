@@ -1,9 +1,14 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
+import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
   title: "El Rosco - Pasapalabra",
@@ -22,17 +27,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <head>
-        <style>{`
-html {
-  font-family: ${GeistSans.style.fontFamily};
-  --font-sans: ${GeistSans.variable};
-  --font-mono: ${GeistMono.variable};
-}
-        `}</style>
-      </head>
-      <body className="min-h-screen bg-background text-foreground transition-colors">
+    <html lang="es" className={`${inter.variable} antialiased`} suppressHydrationWarning>
+      <body className="min-h-screen bg-background text-foreground transition-colors font-sans">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
