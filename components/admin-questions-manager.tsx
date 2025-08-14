@@ -284,43 +284,49 @@ export function AdminQuestionsManager() {
     }) || []
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
-            <BookOpen className="w-6 h-6 text-blue-600" />
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Gestor de Preguntas - Admin</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-6 border-b border-gray-200 dark:border-gray-700 gap-3 sm:gap-0">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-gray-100 truncate">
+              Gestor de Preguntas - Admin
+            </h2>
             {hasUnsavedChanges && (
-              <Badge variant="outline" className="bg-orange-100 text-orange-800">
+              <Badge variant="outline" className="bg-orange-100 text-orange-800 text-xs sm:text-sm flex-shrink-0">
                 Cambios sin guardar
               </Badge>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <Button
               onClick={saveAllChanges}
               disabled={!hasUnsavedChanges || isSaving}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold flex-1 sm:flex-none text-sm sm:text-base"
             >
               {isSaving ? "Guardando..." : "GUARDAR"}
             </Button>
             <Link href="/">
-              <Button variant="outline" size="sm" className="flex items-center gap-2 bg-transparent">
-                <ArrowLeft className="w-4 h-4" />
-                Volver al Menú
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 sm:gap-2 bg-transparent text-xs sm:text-sm"
+              >
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Volver</span>
               </Button>
             </Link>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="w-5 h-5" />
+            <Button variant="ghost" size="sm" onClick={onClose} className="p-1 sm:p-2">
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full sm:w-auto">
+        <div className="p-3 sm:p-6 overflow-y-auto max-h-[calc(95vh-120px)] sm:max-h-[calc(90vh-80px)]">
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
               <Select value={selectedLetter} onValueChange={setSelectedLetter}>
-                <SelectTrigger className="w-20">
+                <SelectTrigger className="w-full sm:w-20">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -336,11 +342,11 @@ export function AdminQuestionsManager() {
                 placeholder="Buscar preguntas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-64"
+                className="w-full sm:flex-1"
               />
 
               <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-full sm:w-32">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -352,7 +358,7 @@ export function AdminQuestionsManager() {
               </Select>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
               <Button
                 onClick={() =>
                   handleEditQuestion({
@@ -365,49 +371,57 @@ export function AdminQuestionsManager() {
                   })
                 }
                 disabled={editingQuestion !== null}
-                className="w-full sm:w-auto"
+                className="w-full text-sm sm:text-base"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Nueva Pregunta
               </Button>
               <input type="file" accept=".json" onChange={importQuestions} ref={fileInputRef} className="hidden" />
-              <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full sm:w-auto">
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full text-sm sm:text-base"
+              >
                 <Upload className="w-4 h-4 mr-2" />
                 Importar
               </Button>
-              <Button variant="outline" onClick={exportQuestions} className="w-full sm:w-auto bg-transparent">
+              <Button
+                variant="outline"
+                onClick={exportQuestions}
+                className="w-full bg-transparent text-sm sm:text-base"
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Exportar
               </Button>
             </div>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg sm:text-xl">Estadísticas - Letra {selectedLetter}</CardTitle>
+          <Card className="mb-6">
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg">Estadísticas - Letra {selectedLetter}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-center">
                 <div>
-                  <div className="text-xl sm:text-2xl font-bold text-green-600">
+                  <div className="text-lg sm:text-2xl font-bold text-green-600">
                     {questions[selectedLetter]?.filter((q) => q.difficulty === "facil").length || 0}
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600">Fácil</div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-bold text-yellow-600">
+                  <div className="text-lg sm:text-2xl font-bold text-yellow-600">
                     {questions[selectedLetter]?.filter((q) => q.difficulty === "medio").length || 0}
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600">Medio</div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-bold text-red-600">
+                  <div className="text-lg sm:text-2xl font-bold text-red-600">
                     {questions[selectedLetter]?.filter((q) => q.difficulty === "dificil").length || 0}
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600">Difícil</div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-bold text-blue-600">
+                  <div className="text-lg sm:text-2xl font-bold text-blue-600">
                     {questions[selectedLetter]?.length || 0}
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600">Total</div>
@@ -417,55 +431,57 @@ export function AdminQuestionsManager() {
           </Card>
 
           {activeTab === "questions" && (
-            <>
-              <div className="space-y-4">
-                {filteredQuestions.map((question) => (
-                  <Card key={question.id} className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline">{question.difficulty}</Badge>
-                          <Badge variant="secondary">{question.category}</Badge>
-                        </div>
-                        <p className="font-medium mb-1">{question.question}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Respuesta: <span className="font-medium">{question.answer}</span>
-                        </p>
+            <div className="space-y-3 sm:space-y-4">
+              {filteredQuestions.map((question) => (
+                <Card key={question.id} className="p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 min-w-0 w-full sm:w-auto">
+                      <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                        <Badge variant="outline" className="text-xs">
+                          {question.difficulty}
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          {question.category}
+                        </Badge>
                       </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditQuestion(question)}
-                          className="flex items-center gap-1"
-                        >
-                          <Edit className="w-4 h-4" />
-                          Editar
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteQuestion(question.id, question.letter)}
-                          className="flex items-center gap-1 text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          Eliminar
-                        </Button>
-                      </div>
+                      <p className="font-medium mb-1 text-sm sm:text-base break-words">{question.question}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 break-words">
+                        Respuesta: <span className="font-medium">{question.answer}</span>
+                      </p>
                     </div>
-                  </Card>
-                ))}
+                    <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditQuestion(question)}
+                        className="flex items-center gap-1 flex-1 sm:flex-none text-xs sm:text-sm"
+                      >
+                        <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">Editar</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteQuestion(question.id, question.letter)}
+                        className="flex items-center gap-1 text-red-600 hover:text-red-700 flex-1 sm:flex-none text-xs sm:text-sm"
+                      >
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">Eliminar</span>
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
 
-                {filteredQuestions.length === 0 && (
-                  <Card>
-                    <CardContent className="p-8 text-center text-gray-500">
-                      No hay preguntas para la letra {selectedLetter}
-                      {searchTerm && " que coincidan con la búsqueda"}
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </>
+              {filteredQuestions.length === 0 && (
+                <Card>
+                  <CardContent className="p-6 sm:p-8 text-center text-gray-500 text-sm sm:text-base">
+                    No hay preguntas para la letra {selectedLetter}
+                    {searchTerm && " que coincidan con la búsqueda"}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
 
           {activeTab === "pending" && (
@@ -528,61 +544,69 @@ export function AdminQuestionsManager() {
         </div>
 
         {editingQuestion && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-60">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-6">
-              <h3 className="text-xl font-bold mb-4">Editar Pregunta</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Pregunta</label>
-                  <Textarea
-                    value={editingQuestion.question}
-                    onChange={(e) => setEditingQuestion({ ...editingQuestion, question: e.target.value })}
-                    placeholder="Escribe la pregunta..."
-                    rows={3}
-                    className="resize-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Respuesta</label>
-                  <Input
-                    value={editingQuestion.answer}
-                    onChange={(e) => setEditingQuestion({ ...editingQuestion, answer: e.target.value })}
-                    placeholder={`Respuesta que empiece con ${selectedLetter}...`}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-60">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold mb-4">
+                  {editingQuestion.id ? "Editar Pregunta" : "Nueva Pregunta"}
+                </h3>
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Dificultad</label>
-                    <Select
-                      value={editingQuestion.difficulty}
-                      onValueChange={(value) =>
-                        setEditingQuestion({ ...editingQuestion, difficulty: value as Difficulty })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="facil">Fácil</SelectItem>
-                        <SelectItem value="medio">Medio</SelectItem>
-                        <SelectItem value="dificil">Difícil</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Categoría</label>
-                    <Input
-                      value={editingQuestion.category}
-                      onChange={(e) => setEditingQuestion({ ...editingQuestion, category: e.target.value })}
-                      placeholder="Categoría..."
+                    <label className="block text-sm font-medium mb-2">Pregunta</label>
+                    <Textarea
+                      value={editingQuestion.question}
+                      onChange={(e) => setEditingQuestion({ ...editingQuestion, question: e.target.value })}
+                      placeholder="Escribe la pregunta..."
+                      rows={3}
+                      className="resize-none text-sm sm:text-base"
                     />
                   </div>
-                </div>
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline" onClick={() => setEditingQuestion(null)}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={saveQuestion}>Guardar Cambios</Button>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Respuesta</label>
+                    <Input
+                      value={editingQuestion.answer}
+                      onChange={(e) => setEditingQuestion({ ...editingQuestion, answer: e.target.value })}
+                      placeholder={`Respuesta que empiece con ${selectedLetter}...`}
+                      className="text-sm sm:text-base"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Dificultad</label>
+                      <Select
+                        value={editingQuestion.difficulty}
+                        onValueChange={(value) =>
+                          setEditingQuestion({ ...editingQuestion, difficulty: value as Difficulty })
+                        }
+                      >
+                        <SelectTrigger className="text-sm sm:text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="facil">Fácil</SelectItem>
+                          <SelectItem value="medio">Medio</SelectItem>
+                          <SelectItem value="dificil">Difícil</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Categoría</label>
+                      <Input
+                        value={editingQuestion.category}
+                        onChange={(e) => setEditingQuestion({ ...editingQuestion, category: e.target.value })}
+                        placeholder="Categoría..."
+                        className="text-sm sm:text-base"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
+                    <Button variant="outline" onClick={() => setEditingQuestion(null)} className="w-full sm:w-auto">
+                      Cancelar
+                    </Button>
+                    <Button onClick={saveQuestion} className="w-full sm:w-auto">
+                      Guardar Cambios
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
