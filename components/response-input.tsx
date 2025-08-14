@@ -2,12 +2,12 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Mic, MicOff, Volume2 } from "lucide-react"
+import { Mic, MicOff, Volume2, Smartphone } from "lucide-react"
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
 import { useSettings } from "@/hooks/use-settings"
 import type { Question } from "@/lib/game-types"
@@ -18,7 +18,7 @@ interface ResponseInputProps {
   onPassapalabra: () => void
   disabled?: boolean
   showAnswer?: boolean
-  onPause?: () => void // Agregado callback para pausar el juego
+  onPause?: () => void
 }
 
 export function ResponseInput({
@@ -34,7 +34,21 @@ export function ResponseInput({
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false)
   const [lastResult, setLastResult] = useState<"correct" | "incorrect" | null>(null)
   const [isProcessingAnswer, setIsProcessingAnswer] = useState(false)
-  const [isPaused, setIsPaused] = useState(false) // Estado para pausar cuando hay respuesta incorrecta
+  const [isPaused, setIsPaused] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isPushToTalk, setIsPushToTalk] = useState(false)
+  const micButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent.toLowerCase()
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent)
+      const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0
+      setIsMobile(isMobileDevice || isTouchDevice)
+    }
+
+    checkMobile()
+  }, [])
 
   const {
     isListening,
@@ -79,9 +93,10 @@ export function ResponseInput({
   useEffect(() => {
     setInputValue("")
     setShowCorrectAnswer(false)
-    setLastResult(null) // Limpiar el cartel de correcto/incorrecto
+    setLastResult(null)
     setIsProcessingAnswer(false)
     setIsPaused(false)
+    setIsPushToTalk(false)
     resetTranscript()
     if (isListening) {
       stopListening()
@@ -92,9 +107,9 @@ export function ResponseInput({
     return text
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Remove accents
-      .replace(/[^\w\s]/g, "") // Remove punctuation
-      .replace(/\s+/g, " ") // Normalize spaces
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s]/g, "")
+      .replace(/\s+/g, " ")
       .trim()
   }
 
@@ -104,16 +119,13 @@ export function ResponseInput({
 
     console.log("Checking answer:", { userAnswer, normalizedUser, normalizedCorrect })
 
-    // Check exact match
     if (normalizedUser === normalizedCorrect) {
       return true
     }
 
-    // Check if user answer contains the correct answer or vice versa (for partial matches)
     const userWords = normalizedUser.split(" ")
     const correctWords = normalizedCorrect.split(" ")
 
-    // Check if all words from correct answer are in user answer
     const allWordsMatch = correctWords.every((word) =>
       userWords.some((userWord) => userWord.includes(word) || word.includes(userWord)),
     )
@@ -146,7 +158,7 @@ export function ResponseInput({
       }
     } else {
       setTimeout(() => {
-        setLastResult(null) // Limpiar cartel de correcto
+        setLastResult(null)
         onAnswer(true)
         setIsProcessingAnswer(false)
       }, 1200)
@@ -155,18 +167,48 @@ export function ResponseInput({
 
   const handleContinue = () => {
     setShowCorrectAnswer(false)
-    setLastResult(null) // Limpiar cartel al continuar
+    setLastResult(null)
     setIsPaused(false)
     setIsProcessingAnswer(false)
     onAnswer(false)
   }
 
   const handleVoiceToggle = () => {
-    if (isListening) {
-      stopListening()
+    if (isMobile) {
+      // En móvil, usar push-to-talk
+      if (!isPushToTalk) {
+        setIsPushToTalk(true)
+        resetTranscript()
+        startListening()
+      } else {
+        setIsPushToTalk(false)
+        stopListening()
+      }
     } else {
+      // En desktop, comportamiento normal
+      if (isListening) {
+        stopListening()
+      } else {
+        resetTranscript()
+        startListening()
+      }
+    }
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isMobile && speechSupported && !disabled && !isProcessingAnswer) {
+      e.preventDefault()
+      setIsPushToTalk(true)
       resetTranscript()
       startListening()
+    }
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isMobile && isPushToTalk) {
+      e.preventDefault()
+      setIsPushToTalk(false)
+      stopListening()
     }
   }
 
@@ -276,13 +318,16 @@ export function ResponseInput({
 
                 {speechSupported && (
                   <Button
-                    onClick={handleVoiceToggle}
-                    variant={isListening ? "destructive" : "outline"}
+                    ref={micButtonRef}
+                    onClick={!isMobile ? handleVoiceToggle : undefined}
+                    onTouchStart={isMobile ? handleTouchStart : undefined}
+                    onTouchEnd={isMobile ? handleTouchEnd : undefined}
+                    variant={isListening || isPushToTalk ? "destructive" : "outline"}
                     size="icon"
                     disabled={disabled || isProcessingAnswer}
-                    className="shrink-0 h-9 w-9 sm:h-10 sm:w-10"
+                    className="shrink-0 h-9 w-9 sm:h-10 sm:w-10 select-none"
                   >
-                    {isListening ? (
+                    {isListening || isPushToTalk ? (
                       <MicOff className="h-3 w-3 sm:h-4 sm:w-4" />
                     ) : (
                       <Mic className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -291,11 +336,20 @@ export function ResponseInput({
                 )}
               </div>
 
-              {isListening && (
+              {(isListening || isPushToTalk) && (
                 <div className="text-center">
                   <Badge variant="outline" className="animate-pulse text-xs sm:text-sm">
                     <Volume2 className="h-3 w-3 mr-1" />
-                    Escuchando... (Di "Pasapalabra" para saltar)
+                    {isMobile ? "Mantén presionado para hablar" : "Escuchando..."} (Di "Pasapalabra" para saltar)
+                  </Badge>
+                </div>
+              )}
+
+              {isMobile && speechSupported && (
+                <div className="text-center">
+                  <Badge variant="secondary" className="text-xs">
+                    <Smartphone className="h-3 w-3 mr-1" />
+                    Modo móvil: Mantén presionado el micrófono para hablar
                   </Badge>
                 </div>
               )}

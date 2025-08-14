@@ -35,7 +35,7 @@ const defaultSettings: ExtendedSettings = {
   categories: ["general"],
   fontSize: "medium",
   highContrast: false,
-  responseMode: "buttons",
+  responseMode: "input", // Cambiado de "buttons" a "input"
   showCorrectAnswer: true,
   voiceLanguage: "es-ES",
   voiceSensitivity: 0.8,
