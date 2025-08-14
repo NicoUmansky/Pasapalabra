@@ -27,9 +27,11 @@ export function useSpeechRecognition({
   const [isSupported, setIsSupported] = useState(false)
   const [transcript, setTranscript] = useState("")
   const [recognition, setRecognition] = useState<any>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   const onResultRef = useRef(onResult)
   const onErrorRef = useRef(onError)
+  const timeoutRef = useRef<NodeJS.Timeout>()
 
   useEffect(() => {
     onResultRef.current = onResult
@@ -41,33 +43,51 @@ export function useSpeechRecognition({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Detectar si es móvil
+      const isMobileDevice = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      setIsMobile(isMobileDevice)
+
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
 
       if (SpeechRecognition) {
         try {
-          const testRecognition = new SpeechRecognition()
-          setIsSupported(true)
-
           const recognitionInstance = new SpeechRecognition()
 
-          recognitionInstance.continuous = continuous
-          recognitionInstance.interimResults = interimResults
-          recognitionInstance.lang = language
-          recognitionInstance.maxAlternatives = 1
-
-          if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          // Configuración específica para móviles
+          if (isMobileDevice) {
             recognitionInstance.continuous = false // Mejor para móvil
             recognitionInstance.interimResults = false // Más estable en móvil
+            recognitionInstance.maxAlternatives = 1
+            // Configuraciones adicionales para móvil
+            recognitionInstance.serviceURI = undefined // Usar servicio por defecto
+          } else {
+            recognitionInstance.continuous = continuous
+            recognitionInstance.interimResults = interimResults
+            recognitionInstance.maxAlternatives = 3
           }
+
+          recognitionInstance.lang = language
 
           recognitionInstance.onstart = () => {
             console.log("Speech recognition started")
             setIsListening(true)
+
+            // Timeout para móviles (auto-stop después de 10 segundos)
+            if (isMobileDevice) {
+              timeoutRef.current = setTimeout(() => {
+                if (recognitionInstance) {
+                  recognitionInstance.stop()
+                }
+              }, 10000)
+            }
           }
 
           recognitionInstance.onend = () => {
             console.log("Speech recognition ended")
             setIsListening(false)
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current)
+            }
           }
 
           recognitionInstance.onresult = (event: any) => {
@@ -77,7 +97,7 @@ export function useSpeechRecognition({
 
             for (let i = event.resultIndex; i < event.results.length; i++) {
               const result = event.results[i]
-              const transcript = result[0].transcript
+              const transcript = result[0].transcript.trim()
 
               if (result.isFinal) {
                 finalTranscript += transcript
@@ -89,9 +109,24 @@ export function useSpeechRecognition({
             const fullTranscript = finalTranscript || interimTranscript
             setTranscript(fullTranscript)
 
-            if (onResultRef.current && fullTranscript.trim()) {
+            if (onResultRef.current && fullTranscript) {
+              // Detectar palabras clave para pasapalabra
+              const lowerTranscript = fullTranscript.toLowerCase()
+              const pasapalabraKeywords = [
+                "pasapalabra",
+                "pasa palabra",
+                "paso",
+                "siguiente",
+                "saltar",
+                "pasar",
+                "skip",
+                "next",
+              ]
+
+              const isPasapalabra = pasapalabraKeywords.some((keyword) => lowerTranscript.includes(keyword))
+
               onResultRef.current({
-                transcript: fullTranscript.trim(),
+                transcript: isPasapalabra ? "PASAPALABRA" : fullTranscript,
                 confidence: event.results[event.results.length - 1]?.[0]?.confidence || 0.8,
                 isFinal: event.results[event.results.length - 1]?.isFinal || false,
               })
@@ -102,19 +137,30 @@ export function useSpeechRecognition({
             console.error("Speech recognition error:", event.error)
             setIsListening(false)
 
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current)
+            }
+
             let errorMessage = event.error
             switch (event.error) {
               case "not-allowed":
-                errorMessage = "Permisos de micrófono denegados. Por favor, permite el acceso al micrófono."
+                errorMessage = isMobileDevice
+                  ? "Permisos de micrófono denegados. Ve a Configuración > Safari/Chrome > Micrófono y permite el acceso."
+                  : "Permisos de micrófono denegados. Por favor, permite el acceso al micrófono."
                 break
               case "no-speech":
-                errorMessage = "No se detectó voz. Intenta hablar más claro."
+                errorMessage = "No se detectó voz. Intenta hablar más claro y cerca del micrófono."
                 break
               case "audio-capture":
-                errorMessage = "No se pudo acceder al micrófono."
+                errorMessage = isMobileDevice
+                  ? "No se pudo acceder al micrófono. Verifica que no esté siendo usado por otra app."
+                  : "No se pudo acceder al micrófono."
                 break
               case "network":
                 errorMessage = "Error de conexión. Verifica tu conexión a internet."
+                break
+              case "service-not-allowed":
+                errorMessage = "Servicio de reconocimiento de voz no disponible en este navegador."
                 break
               default:
                 errorMessage = `Error de reconocimiento de voz: ${event.error}`
@@ -127,10 +173,22 @@ export function useSpeechRecognition({
 
           recognitionInstance.onspeechend = () => {
             console.log("Speech ended")
-            recognitionInstance.stop()
+            // En móviles, detener automáticamente
+            if (isMobileDevice) {
+              recognitionInstance.stop()
+            }
+          }
+
+          recognitionInstance.onsoundstart = () => {
+            console.log("Sound detected")
+          }
+
+          recognitionInstance.onsoundend = () => {
+            console.log("Sound ended")
           }
 
           setRecognition(recognitionInstance)
+          setIsSupported(true)
         } catch (error) {
           console.error("Error creating speech recognition:", error)
           setIsSupported(false)
@@ -145,14 +203,24 @@ export function useSpeechRecognition({
   const startListening = useCallback(async () => {
     if (recognition && !isListening) {
       try {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Solicitar permisos explícitamente en móviles
+        if (isMobile && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
           try {
-            await navigator.mediaDevices.getUserMedia({ audio: true })
+            const stream = await navigator.mediaDevices.getUserMedia({
+              audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+                sampleRate: 44100,
+              },
+            })
+            // Cerrar el stream inmediatamente, solo necesitábamos los permisos
+            stream.getTracks().forEach((track) => track.stop())
           } catch (permissionError) {
             console.error("Microphone permission denied:", permissionError)
             if (onErrorRef.current) {
               onErrorRef.current(
-                "Permisos de micrófono denegados. Por favor, permite el acceso al micrófono en la configuración del navegador.",
+                "Permisos de micrófono denegados. Ve a Configuración del navegador y permite el acceso al micrófono para este sitio.",
               )
             }
             return
@@ -165,16 +233,19 @@ export function useSpeechRecognition({
         console.error("Error starting speech recognition:", error)
         setIsListening(false)
         if (onErrorRef.current) {
-          onErrorRef.current("Error al iniciar el reconocimiento de voz")
+          onErrorRef.current("Error al iniciar el reconocimiento de voz. Intenta de nuevo.")
         }
       }
     }
-  }, [recognition, isListening])
+  }, [recognition, isListening, isMobile])
 
   const stopListening = useCallback(() => {
     if (recognition && isListening) {
       try {
         recognition.stop()
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
       } catch (error) {
         console.error("Error stopping speech recognition:", error)
         setIsListening(false)
@@ -193,5 +264,6 @@ export function useSpeechRecognition({
     startListening,
     stopListening,
     resetTranscript,
+    isMobile,
   }
 }
