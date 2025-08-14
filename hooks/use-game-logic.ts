@@ -44,36 +44,23 @@ export function useGameLogic() {
   >([])
 
   const [skippedQuestions, setSkippedQuestions] = useState<Map<string, { question: string; answer: string }>>(new Map())
-
   const [isProcessingResponse, setIsProcessingResponse] = useState(false)
   const [isPausedForIncorrect, setIsPausedForIncorrect] = useState(false)
+  const [isSecondRound, setIsSecondRound] = useState(false) // Agregado para trackear segunda vuelta
 
   const findNextPendingLetter = useCallback((letters: LetterState[], currentLetter: string): string | null => {
     const currentIndex = letters.findIndex((l) => l.letter === currentLetter)
 
-    // First, look for pending letters from current position forward
+    // Buscar desde la letra actual hacia adelante
     for (let i = currentIndex + 1; i < letters.length; i++) {
       if (letters[i].status === "pending") {
         return letters[i].letter
       }
     }
 
-    // Then look from beginning to current position
+    // Si no encuentra, buscar desde el principio hasta la letra actual
     for (let i = 0; i < currentIndex; i++) {
       if (letters[i].status === "pending") {
-        return letters[i].letter
-      }
-    }
-
-    // If no pending letters, check for skipped letters (second round)
-    for (let i = currentIndex + 1; i < letters.length; i++) {
-      if (letters[i].status === "skipped") {
-        return letters[i].letter
-      }
-    }
-
-    for (let i = 0; i < currentIndex; i++) {
-      if (letters[i].status === "skipped") {
         return letters[i].letter
       }
     }
@@ -83,7 +70,6 @@ export function useGameLogic() {
 
   const loadQuestion = useCallback(
     (letter: string, difficulty: string) => {
-      // Si hay una pregunta saltada para esta letra, usarla
       const skippedQuestion = skippedQuestions.get(letter)
       if (skippedQuestion) {
         setCurrentQuestion({
@@ -132,6 +118,7 @@ export function useGameLogic() {
 
     setGameHistory([])
     setSkippedQuestions(new Map())
+    setIsSecondRound(false) // Reset segunda vuelta
     loadQuestion("A", gameState.settings.difficulty)
   }, [gameState.settings.difficulty, loadQuestion])
 
@@ -143,17 +130,18 @@ export function useGameLogic() {
       const currentLetter = gameState.currentLetter
 
       if (response === "skip") {
-        setSkippedQuestions(
-          (prev) =>
-            new Map(
-              prev.set(currentLetter, {
-                question: currentQuestion.question,
-                answer: currentQuestion.answer,
-              }),
-            ),
-        )
+        if (!skippedQuestions.has(currentLetter)) {
+          setSkippedQuestions(
+            (prev) =>
+              new Map(
+                prev.set(currentLetter, {
+                  question: currentQuestion.question,
+                  answer: currentQuestion.answer,
+                }),
+              ),
+          )
+        }
       } else {
-        // Remove from skipped questions if answered
         setSkippedQuestions((prev) => {
           const newMap = new Map(prev)
           newMap.delete(currentLetter)
@@ -161,7 +149,7 @@ export function useGameLogic() {
         })
       }
 
-      // Add to history
+      // Agregar al historial
       setGameHistory((prev) => [
         ...prev,
         {
@@ -193,13 +181,10 @@ export function useGameLogic() {
           remaining: Math.max(0, prev.score.remaining - (response !== "skip" ? 1 : 0)),
         }
 
-        const nextLetter = findNextPendingLetter(updatedLetters, currentLetter)
-
         return {
           ...prev,
           letters: updatedLetters,
           score: newScore,
-          currentLetter: nextLetter || currentLetter,
         }
       })
 
@@ -210,59 +195,52 @@ export function useGameLogic() {
       }
 
       setTimeout(() => {
-        setGameState((prevState) => {
-          const updatedLetters = prevState.letters.map((l) =>
-            l.letter === currentLetter
-              ? {
-                  ...l,
-                  status: response === "skip" ? "skipped" : response === "correct" ? "correct" : "incorrect",
-                }
-              : l,
+        const updatedLetters = gameState.letters.map((l) =>
+          l.letter === currentLetter
+            ? {
+                ...l,
+                status: response === "skip" ? "skipped" : response === "correct" ? "correct" : "incorrect",
+              }
+            : l,
+        )
+
+        const nextLetter = findNextPendingLetter(updatedLetters, currentLetter)
+
+        if (nextLetter) {
+          setGameState((prev) => ({ ...prev, currentLetter: nextLetter }))
+          loadQuestion(nextLetter, gameState.settings.difficulty)
+        } else {
+          const remainingSkipped = Array.from(skippedQuestions.keys()).filter(
+            (letter) => updatedLetters.find((l) => l.letter === letter)?.status === "skipped",
           )
 
-          const nextLetter = findNextPendingLetter(updatedLetters, currentLetter)
-
-          if (nextLetter) {
-            // Continue with next pending letter
-            loadQuestion(nextLetter, prevState.settings.difficulty)
-            return {
-              ...prevState,
-              currentLetter: nextLetter,
-              letters: updatedLetters,
-            }
+          if (remainingSkipped.length > 0 && !isSecondRound) {
+            setIsSecondRound(true)
+            const firstSkippedLetter = remainingSkipped[0]
+            setGameState((prev) => ({
+              ...prev,
+              currentLetter: firstSkippedLetter,
+              letters: prev.letters.map((l) => (l.letter === firstSkippedLetter ? { ...l, status: "pending" } : l)),
+            }))
+            loadQuestion(firstSkippedLetter, gameState.settings.difficulty)
           } else {
-            // Check if there are any skipped letters for second round
-            const hasSkippedLetters = updatedLetters.some((l) => l.status === "skipped")
-
-            if (hasSkippedLetters) {
-              // Find first skipped letter and convert it to pending
-              const firstSkippedLetter = updatedLetters.find((l) => l.status === "skipped")
-              if (firstSkippedLetter) {
-                const newLetters = updatedLetters.map((l) =>
-                  l.letter === firstSkippedLetter.letter ? { ...l, status: "pending" as const } : l,
-                )
-
-                loadQuestion(firstSkippedLetter.letter, prevState.settings.difficulty)
-                return {
-                  ...prevState,
-                  currentLetter: firstSkippedLetter.letter,
-                  letters: newLetters,
-                }
-              }
-            }
-
-            // No more letters, end game
-            setGameState((prev) => ({ ...prev, isPlaying: false, isPaused: false }))
-            setCurrentQuestion(null)
-            setIsPausedForIncorrect(false)
-            return prevState
+            // Fin del juego
+            endGame()
           }
-        })
+        }
 
         setIsProcessingResponse(false)
       }, 1000)
     },
-    [currentQuestion, gameState, findNextPendingLetter, loadQuestion, isProcessingResponse],
+    [
+      currentQuestion,
+      gameState,
+      findNextPendingLetter,
+      loadQuestion,
+      isProcessingResponse,
+      skippedQuestions,
+      isSecondRound,
+    ],
   )
 
   const togglePause = useCallback(() => {
@@ -297,6 +275,7 @@ export function useGameLogic() {
     setGameHistory([])
     setSkippedQuestions(new Map())
     setIsPausedForIncorrect(false)
+    setIsSecondRound(false) // Reset segunda vuelta
   }, [])
 
   const updateSettings = useCallback((newSettings: GameSettings) => {
@@ -334,7 +313,7 @@ export function useGameLogic() {
 
       return () => clearInterval(timer)
     }
-  }, [gameState.isPlaying, gameState.isPaused, isPausedForIncorrect, gameState.timeRemaining])
+  }, [gameState.isPlaying, gameState.isPaused, isPausedForIncorrect, gameState.timeRemaining, endGame])
 
   const pauseForIncorrect = useCallback(() => {
     setIsPausedForIncorrect(true)
@@ -343,29 +322,36 @@ export function useGameLogic() {
   const resumeFromIncorrect = useCallback(() => {
     setIsPausedForIncorrect(false)
 
-    // Continuar con la siguiente pregunta
     const currentLetter = gameState.currentLetter
-    const nextLetter = findNextPendingLetter(gameState.letters, currentLetter)
+    const updatedLetters = gameState.letters.map((l) =>
+      l.letter === currentLetter ? { ...l, status: "incorrect" as const } : l,
+    )
+
+    const nextLetter = findNextPendingLetter(updatedLetters, currentLetter)
 
     if (nextLetter) {
       setGameState((prev) => ({ ...prev, currentLetter: nextLetter }))
       loadQuestion(nextLetter, gameState.settings.difficulty)
     } else {
       // Verificar si quedan letras saltadas
-      const skippedLetters = gameState.letters.filter((l) => l.status === "skipped")
-      if (skippedLetters.length > 0) {
-        const firstSkipped = skippedLetters[0]
+      const remainingSkipped = Array.from(skippedQuestions.keys()).filter(
+        (letter) => updatedLetters.find((l) => l.letter === letter)?.status === "skipped",
+      )
+
+      if (remainingSkipped.length > 0 && !isSecondRound) {
+        setIsSecondRound(true)
+        const firstSkippedLetter = remainingSkipped[0]
         setGameState((prev) => ({
           ...prev,
-          currentLetter: firstSkipped.letter,
-          letters: prev.letters.map((l) => (l.letter === firstSkipped.letter ? { ...l, status: "pending" } : l)),
+          currentLetter: firstSkippedLetter,
+          letters: prev.letters.map((l) => (l.letter === firstSkippedLetter ? { ...l, status: "pending" } : l)),
         }))
-        loadQuestion(firstSkipped.letter, gameState.settings.difficulty)
+        loadQuestion(firstSkippedLetter, gameState.settings.difficulty)
       } else {
         endGame()
       }
     }
-  }, [gameState, findNextPendingLetter, loadQuestion])
+  }, [gameState, findNextPendingLetter, loadQuestion, endGame, skippedQuestions, isSecondRound])
 
   const getGameStats = useCallback(() => {
     const totalAnswered = gameState.score.correct + gameState.score.incorrect
@@ -395,5 +381,6 @@ export function useGameLogic() {
     pauseForIncorrect,
     resumeFromIncorrect,
     isPausedForIncorrect, // Exportar estado de pausa por respuesta incorrecta
+    isSecondRound, // Exportar estado de segunda vuelta
   }
 }

@@ -41,6 +41,7 @@ export function GameSettings({ settings, onSave, onClose }: GameSettingsProps) {
     const updatedSettings = { ...localSettings, theme: newTheme }
     setLocalSettings(updatedSettings)
 
+    // Aplicar tema inmediatamente
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark")
     } else {
@@ -49,7 +50,7 @@ export function GameSettings({ settings, onSave, onClose }: GameSettingsProps) {
   }
 
   useEffect(() => {
-    // Aplicar tema inicial al montar el componente
+    // Aplicar tema inicial
     if (localSettings.theme === "dark") {
       document.documentElement.classList.add("dark")
     } else {
@@ -64,6 +65,7 @@ export function GameSettings({ settings, onSave, onClose }: GameSettingsProps) {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg sm:text-xl font-semibold">Configuración del Juego</h2>
             <div className="flex items-center gap-2">
+              {/* Interruptor de tema */}
               <Button variant="ghost" size="sm" onClick={toggleTheme} className="p-2">
                 {localSettings.theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </Button>
@@ -187,6 +189,7 @@ export function GameSettings({ settings, onSave, onClose }: GameSettingsProps) {
               )}
             </div>
 
+            {/* Información de dificultad */}
             <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
               <h3 className="font-medium mb-2">Información de Dificultad</h3>
               <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
