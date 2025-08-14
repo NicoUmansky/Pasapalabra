@@ -2,161 +2,56 @@
 DELETE FROM questions;
 
 -- Insertar todas las preguntas
-INSERT INTO questions (letter, question, answer, difficulty, category) VALUES
+INSERT INTO questions (question_id, letter, question, answer, difficulty, category) VALUES
 -- Letra A
-('A', 'Conjunto de partículas minerales en la playa', 'Arena', 'facil', 'naturaleza'),
-('A', 'Animal que vuela y tiene plumas', 'Ave', 'facil', 'animales'),
-('A', 'Líquido transparente e incoloro esencial para la vida', 'Agua', 'facil', 'naturaleza'),
-('A', 'Instrumento musical de cuerda pulsada', 'Arpa', 'medio', 'musica'),
-('A', 'Capital de Grecia', 'Atenas', 'medio', 'geografia'),
-('A', 'Sustancia que combate infecciones bacterianas', 'Antibiótico', 'dificil', 'medicina'),
-
+('a1', 'A', 'Conjunto de partículas minerales en la playa', 'Arena', 'facil', 'naturaleza'),('a2', 'A', 'Animal que vuela y tiene plumas', 'Ave', 'facil', 'animales'),('a3', 'A', 'Líquido transparente e incoloro esencial para la vida', 'Agua', 'facil', 'naturaleza'),('a4', 'A', 'Instrumento musical de cuerda pulsada', 'Arpa', 'medio', 'musica'),('a5', 'A', 'Capital de Grecia', 'Atenas', 'medio', 'geografia'),('a6', 'A', 'Sustancia que combate infecciones bacterianas', 'Antibiótico', 'dificil', 'medicina'),('a7', 'A', 'Estructura con forma de almendra ubicada en el cerebro y en la garganta', 'Amigdala', 'dificil', 'medicina '),('a8', 'A', 'Tipo de animal que puede vivir tanto en el agua como en la tierra', 'Anfibio', 'medio', 'animales'),('a9', 'A', 'Persona que realiza saltos y piruetas en espectáculos', 'Acrobata', 'dificil', 'general'),('a10', 'A', 'Juego de estrategia con piezas blancas y negras', 'Ajedrez', 'medio', 'general'),('a11', 'A', 'Sistema operativo en telefonos de Samsung, Google, Motorola, entre otros.', 'Android', 'dificil', 'general'),
 -- Letra B
-('B', 'Sitio poblado de árboles y matas', 'Bosque', 'facil', 'naturaleza'),
-('B', 'Deporte que se juega con una pelota y dos aros elevados', 'Baloncesto', 'facil', 'deportes'),
-('B', 'Embarcación para navegar', 'Barco', 'facil', 'transporte'),
-('B', 'Escritor argentino autor de ''El Aleph'' y ''Ficciones''', 'Borges', 'dificil', 'literatura'),
-
+('b1', 'B', 'Sitio poblado de árboles y matas', 'Bosque', 'facil', 'naturaleza'),('b2', 'B', 'Embarcación para navegar', 'Barco', 'facil', 'transporte'),('b3', 'B', 'Escritor argentino autor de ''El Aleph'' y ''Ficciones''', 'Borges', 'dificil', 'literatura'),('b4', 'B', 'Deporte en equipo que se usa una pelota anaranjada', 'Basquet', 'medio', 'deportes'),('b5', 'B', 'Deporte poco comun que se juega con raquetas y un volante', 'Badminton', 'dificil', 'deporte'),('b6', 'B', 'Instrumento de navegacion que señala siempre al norte', 'Brujula', 'medio', 'general'),
 -- Letra C
-('C', 'Bebida fermentada de cebada', 'Cerveza', 'facil', 'comida'),
-('C', 'Bebida caliente hecha con granos tostados', 'Café', 'facil', 'comida'),
-('C', 'Vehículo de cuatro ruedas', 'Coche', 'facil', 'transporte'),
-('C', 'Tejido flexible que recubre articulaciones y nariz', 'Cartílago', 'dificil', 'anatomia'),
-
+('c1', 'C', 'Bebida fermentada de cebada', 'Cerveza', 'facil', 'comida'),('c2', 'C', 'Bebida caliente hecha con granos tostados', 'Café', 'facil', 'comida'),('c3', 'C', 'Tejido flexible que recubre articulaciones y nariz', 'Cartílago', 'dificil', 'anatomia'),('c4', 'C', 'Animal jorobado', 'Camello', 'facil', 'general'),('c5', 'C', 'Vehículo de gran tamaño con cuatro ruedas', 'Camion', 'medio', 'general'),('c6', 'C', 'Hueso duro en el centro de algunas frutas que contiene la semilla.', 'Carozo', 'medio', 'general'),('c7', 'C', 'Una línea que cambia continuamente de dirección.', 'Curva', 'medio', 'General'),('c8', 'C', 'Dinero digital descentralizado', 'Criptomoneda', 'dificil', 'economia'),('c9', 'C', 'Metal rojizo conocido por ser un excelente conductor de electricidad y calor.', 'Cobre', 'dificil', 'ciencia'),('c10', 'C', 'Marca de bebida dulcemente gasificada sin alcohol.', 'Coca Cola', 'facil', 'general'),
 -- Letra D
-('D', 'Actor estadounidense protagonista de Titanic', 'DiCaprio', 'dificil', 'espectaculos'),
-('D', 'Territorio arenoso o pedregoso con escasa vegetación', 'Desierto', 'facil', 'geografia'),
-('D', 'Forma de gobierno donde el pueblo elige', 'Democracia', 'medio', 'politica'),
-('D', 'Gas formado por carbono y oxígeno presente en respiración y combustión', 'Dióxido de carbono', 'dificil', 'quimica'),
-
+('d1', 'D', 'Actor estadounidense protagonista de Titanic', 'DiCaprio', 'dificil', 'espectaculos'),('d2', 'D', 'Territorio arenoso o pedregoso con escasa vegetación', 'Desierto', 'facil', 'geografia'),('d3', 'D', 'Forma de gobierno donde el pueblo elige', 'Democracia', 'medio', 'politica'),('d4', 'D', 'Animal que aparece más de cien veces en una película de Disney', 'Dalmata', 'facil', 'entretenimiento'),('d5', 'D', 'Que equivale a 12 unidades', 'Docena', 'facil', 'general'),('d6', 'D', 'Tenista Serbio Ex N1 del ranking ATP', 'Djokovic', 'dificil', 'deporte'),('d7', 'D', 'Referente a un muerto', 'Difunto', 'dificil', 'general'),('d8', 'D', 'Cuchillo corto similar a una espada', 'Daga', 'dificil', 'general'),('d9', 'D', 'Figura geométrica de 10 lados', 'Decaedro', 'dificil', 'general'),
 -- Letra E
-('E', 'Ocultación de un astro por otro', 'Eclipse', 'facil', 'astronomia'),
-('E', 'Animal paquidermo con trompa', 'Elefante', 'facil', 'animales'),
-('E', 'Lugar donde se enseña', 'Escuela', 'facil', 'educacion'),
-('E', 'Conjunto de seres vivos y su entorno que interactúan', 'Ecosistema', 'dificil', 'ciencia'),
-
+('e1', 'E', 'Ocultación de un astro por otro', 'Eclipse', 'facil', 'astronomia'),('e2', 'E', 'Animal paquidermo con trompa', 'Elefante', 'facil', 'animales'),('e3', 'E', 'Lugar donde se enseña', 'Escuela', 'facil', 'educacion'),('e4', 'E', 'Conjunto de seres vivos y su entorno que interactúan', 'Ecosistema', 'dificil', 'ciencia'),('e5', 'E', 'Capital de Suecia', 'Estocolmo', 'medio', 'mundi'),('e6', 'E', 'Trastorno neurológico que causa convulsiones', 'Epilepsia', 'dificil', 'medicina'),('e7', 'E', 'Aparato que produce y emite calor', 'Estufa', 'medio', 'general'),('e8', 'E', 'Deporte olímpico qué involucra lucha de espadas', 'Esgrima', 'dificil', 'general'),
 -- Letra F
-('F', 'Deporte que se juega con los pies', 'Fútbol', 'facil', 'deportes'),
-('F', 'Historia breve con enseñanza moral', 'Fábula', 'facil', 'literatura'),
-('F', 'Red social más grande del mundo', 'Facebook', 'facil', 'tecnologia'),
-('F', 'Proceso por el cual las plantas convierten luz en energía', 'Fotosíntesis', 'dificil', 'biologia'),
-
+('f1', 'F', 'Deporte que se juega con los pies', 'Fútbol', 'facil', 'deportes'),('f2', 'F', 'Historia breve con enseñanza moral', 'Fábula', 'facil', 'literatura'),('f3', 'F', 'Red social más grande del mundo', 'Facebook', 'facil', 'tecnologia'),('f4', 'F', 'Proceso por el cual las plantas convierten luz en energía', 'Fotosíntesis', 'dificil', 'biologia'),('f5', 'F', 'Resto de un ser vivo conservado en rocas durante muchos años', 'Fosil', 'medio', 'general'),('f6', 'F', 'Elemento de la tabla y objeto utilizado para prender fuego', 'Fosforo', 'medio', 'quimica'),('f7', 'F', 'Creencia en algo o alguien', 'Fe', 'medio', 'general'),('f8', 'F', 'Tipo de pasta alargada', 'Fideos', 'facil', 'gastronomía'),('f9', 'F', 'Padre del psicoanálisis', 'Freud', 'dificil', 'general'),('f10', 'F', 'Marca de autos creada por Henry', 'Ford', 'medio', 'general'),('f11', 'F', 'Alma o espíritu de un difunto que se manifiesta en el mundo de los vivos', 'Fantasma', 'medio', 'general'),('f12', 'F', 'Trago popular asociado a la provincia de Cordoba', 'Fernet', 'facil', 'general'),('f13', 'F', 'Acción contraria a la verdad y a la rectitud, con la que se perjudica a alguien.', 'Fraude', 'dificil', 'general'),
 -- Letra G
-('G', 'Animal doméstico que maúlla', 'Gato', 'facil', 'animales'),
-('G', 'Deporte que se juega con palos y pelota pequeña', 'Golf', 'facil', 'deportes'),
-('G', 'Buscador de internet más utilizado', 'Google', 'facil', 'tecnologia'),
-('G', 'Masa de hielo en movimiento formada por acumulación de nieve', 'Glaciar', 'dificil', 'geografia'),
-
+('g1', 'G', 'Animal doméstico que maúlla', 'Gato', 'facil', 'animales'),('g2', 'G', 'Deporte que se juega con palos y pelota pequeña', 'Golf', 'facil', 'deportes'),('g3', 'G', 'Buscador de internet más utilizado', 'Google', 'facil', 'tecnologia'),('g4', 'G', 'Masa de hielo en movimiento formada por acumulación de nieve', 'Glaciar', 'dificil', 'geografia'),('g5', 'G', 'Forma de carbono utilizada en lápices y otros elementos', 'Grafito', 'medio', 'general'),('g6', 'G', 'Adjetivo que refiere a algo de gran tamaño', 'Gigante', 'medio', 'general'),('g7', 'G', 'Médico que se especializa en el aparato reproductor femenino', 'Ginecologo', 'medio', 'general'),
 -- Letra H
-('H', 'Postre frío hecho con leche y azúcar', 'Helado', 'facil', 'comida'),
-('H', 'Lugar donde vive una familia', 'Hogar', 'facil', 'general'),
-('H', 'Deporte que se juega sobre hielo', 'Hockey', 'medio', 'deportes'),
-('H', 'Proteína de la sangre que transporta oxígeno', 'Hemoglobina', 'dificil', 'biologia'),
-
+('h1', 'H', 'Postre frío hecho con leche y azúcar', 'Helado', 'facil', 'comida'),('h2', 'H', 'Lugar donde vive una familia', 'Hogar', 'facil', 'general'),('h3', 'H', 'Deporte que se juega sobre hielo', 'Hockey', 'medio', 'deportes'),('h4', 'H', 'Proteína de la sangre que transporta oxígeno', 'Hemoglobina', 'dificil', 'biologia');
 -- Letra I
-('I', 'Aplicación móvil para compartir fotos', 'Instagram', 'facil', 'tecnologia'),
-('I', 'Lugar donde se reza', 'Iglesia', 'facil', 'religion'),
-('I', 'Estación del año más fría', 'Invierno', 'facil', 'naturaleza'),
-('I', 'Aumento generalizado y sostenido de los precios', 'Inflación', 'dificil', 'economia'),
-
+('i1', 'I', 'Aplicación móvil para compartir fotos', 'Instagram', 'facil', 'tecnologia'),('i2', 'I', 'Lugar donde se reza', 'Iglesia', 'facil', 'religion'),('i3', 'I', 'Estación del año más fría', 'Invierno', 'facil', 'naturaleza'),('i4', 'I', 'Aumento generalizado y sostenido de los precios', 'Inflación', 'dificil', 'economia'),('i5', 'I', 'Material u objeto que produce un campo magnetico', 'Iman', 'medio', 'general'),('i6', 'I', 'Fuego de grandes dimensiones qué se desarrolla sin control', 'Incendio', 'medio', 'general'),
 -- Letra J
-('J', 'Lugar donde se cultivan plantas', 'Jardín', 'facil', 'naturaleza'),
-('J', 'Profesión que administra justicia', 'Juez', 'medio', 'profesiones'),
-('J', 'Cantante estadounidense ''King of Pop''', 'Jackson', 'medio', 'espectaculos'),
-('J', 'Planeta más grande del sistema solar', 'Júpiter', 'dificil', 'astronomia'),
-
+('j1', 'J', 'Lugar donde se cultivan plantas', 'Jardín', 'facil', 'naturaleza'),('j2', 'J', 'Profesión que administra justicia', 'Juez', 'medio', 'profesiones'),('j3', 'J', 'Cantante estadounidense ''King of Pop''', 'Jackson', 'medio', 'espectaculos'),('j4', 'J', 'Planeta más grande del sistema solar', 'Júpiter', 'dificil', 'astronomia'),
 -- Letra K
-('K', 'Unidad de peso de mil gramos', 'Kilogramo', 'facil', 'medidas'),
-('K', 'Arte marcial japonés de golpes con manos y pies', 'Karate', 'medio', 'deportes'),
-('K', 'Aderezo de tomate dulce y ácido', 'Ketchup', 'facil', 'comida'),
-('K', 'Unidad de longitud equivalente a mil metros', 'Kilómetro', 'dificil', 'medidas'),
-
+('k1', 'K', 'Unidad de peso de mil gramos', 'Kilogramo', 'facil', 'medidas'),('k2', 'K', 'Arte marcial japonés de golpes con manos y pies', 'Karate', 'medio', 'deportes'),('k3', 'K', 'Aderezo de tomate dulce y ácido', 'Ketchup', 'facil', 'comida'),('k4', 'K', 'Unidad de longitud equivalente a mil metros', 'Kilómetro', 'dificil', 'medidas'),('k5', 'K', 'Feria con muchos juegos', 'Kermes', 'medio', 'general'),
 -- Letra L
-('L', 'Animal que ruge en la selva', 'León', 'facil', 'animales'),
-('L', 'Satélite natural de la Tierra', 'Luna', 'facil', 'astronomia'),
-('L', 'Bebida blanca que dan las vacas', 'Leche', 'facil', 'comida'),
-('L', 'Estructura de caminos complicados diseñada para confundir', 'Laberinto', 'medio', 'general'),
-('L', 'Coordenada geográfica que indica la distancia al ecuador', 'Latitud', 'dificil', 'geografia'),
-
+('l1', 'L', 'Animal que ruge en la selva', 'León', 'facil', 'animales'),('l2', 'L', 'Satélite natural de la Tierra', 'Luna', 'facil', 'astronomia'),('l3', 'L', 'Bebida blanca que dan las vacas', 'Leche', 'facil', 'comida'),('l4', 'L', 'Estructura de caminos complicados diseñada para confundir', 'Laberinto', 'medio', 'general'),('l5', 'L', 'Coordenada geográfica que indica la distancia al ecuador', 'Latitud', 'dificil', 'geografia'),
 -- Letra M
-('M', 'Fruto del manzano', 'Manzana', 'facil', 'comida'),
-('M', 'Futbolista argentino apodado ''La Pulga''', 'Messi', 'medio', 'deportes'),
-('M', 'Videojuego de construcción con bloques', 'Minecraft', 'facil', 'tecnologia'),
-('M', 'Orgánulo celular encargado de producir energía', 'Mitocondria', 'dificil', 'biologia'),
-
+('m1', 'M', 'Fruto del manzano', 'Manzana', 'facil', 'comida'),('m2', 'M', 'Futbolista argentino apodado ''La Pulga''', 'Messi', 'medio', 'deportes'),('m3', 'M', 'Videojuego de construcción con bloques', 'Minecraft', 'facil', 'tecnologia'),('m4', 'M', 'Orgánulo celular encargado de producir energía', 'Mitocondria', 'dificil', 'biologia'),('m5', 'M', 'Poste vertical que sostiene banderas o velas en un barco', 'Mastil', 'medio', 'general'),('m6', 'M', 'Herramienta para golpear', 'Martillo', 'medio', 'general'),
 -- Letra N
-('N', 'Masa de vapor de agua suspendida en la atmósfera', 'Nube', 'facil', 'naturaleza'),
-('N', 'Órgano del olfato', 'Nariz', 'facil', 'anatomia'),
-('N', 'Plataforma de streaming de series y películas', 'Netflix', 'facil', 'tecnologia'),
-('N', 'Gas que compone la mayor parte del aire', 'Nitrógeno', 'dificil', 'quimica'),
-
+('n1', 'N', 'Masa de vapor de agua suspendida en la atmósfera', 'Nube', 'facil', 'naturaleza'),('n2', 'N', 'Órgano del olfato', 'Nariz', 'facil', 'anatomia'),('n3', 'N', 'Plataforma de streaming de series y películas', 'Netflix', 'facil', 'tecnologia'),('n4', 'N', 'Gas que compone la mayor parte del aire', 'Nitrógeno', 'dificil', 'quimica'),
 -- Letra O
-('O', 'Órgano de los sentidos para oír', 'Oído', 'facil', 'anatomia'),
-('O', 'Capital de Noruega', 'Oslo', 'medio', 'geografia'),
-('O', 'Órganos de la vista', 'Ojos', 'facil', 'anatomia'),
-('O', 'Trayectoria que sigue un cuerpo alrededor de otro por gravedad', 'Órbita', 'dificil', 'astronomia'),
-
+('o1', 'O', 'Órgano de los sentidos para oír', 'Oído', 'facil', 'anatomia'),('o2', 'O', 'Capital de Noruega', 'Oslo', 'medio', 'geografia'),('o3', 'O', 'Órganos de la vista', 'Ojos', 'facil', 'anatomia'),('o4', 'O', 'Trayectoria que sigue un cuerpo alrededor de otro por gravedad', 'Órbita', 'dificil', 'astronomia'),('o5', 'O', 'Preparación a base de huevo', 'Omelette', 'medio', 'gastronomía'),('o6', 'O', 'Perturbación propaganda en el agua', 'Ola', 'medio', 'general'),('o7', 'O', 'Curva cerrada y convexa, similar a una elipse', 'Ovalo', 'dificil', 'general'),('o8', 'O', 'La cicatriz del cordón umbilical en el abdomen.', 'Ombligo', 'medio', 'medicina'),
 -- Letra P
-('P', 'Instrumento musical de teclas', 'Piano', 'medio', 'musica'),
-('P', 'Animal doméstico fiel al hombre', 'Perro', 'facil', 'animales'),
-('P', 'Comida italiana hecha con masa, salsa y queso', 'Pizza', 'facil', 'comida'),
-('P', 'Supercontinente que existió hace cientos de millones de años', 'Pangea', 'dificil', 'geologia'),
-
+('p1', 'P', 'Instrumento musical de teclas', 'Piano', 'medio', 'musica'),('p2', 'P', 'Animal doméstico fiel al hombre', 'Perro', 'facil', 'animales'),('p3', 'P', 'Comida italiana hecha con masa, salsa y queso', 'Pizza', 'facil', 'comida'),('p4', 'P', 'Supercontinente que existió hace cientos de millones de años', 'Pangea', 'dificil', 'geologia'),('p5', 'P', 'Elemento de la tabla periodica que te brinda al comer una banana', 'Potasio', 'dificil', 'ciencia'),
 -- Letra Q
-('Q', 'Ciencia que estudia las sustancias', 'Química', 'medio', 'ciencia'),
-('Q', 'Producto lácteo para untar', 'Queso', 'facil', 'comida'),
-('Q', 'Capital de Ecuador', 'Quito', 'medio', 'geografia'),
-('Q', 'Número mínimo de miembros necesarios para sesionar', 'Quórum', 'dificil', 'derecho'),
-
+('q1', 'Q', 'Ciencia que estudia las sustancias', 'Química', 'medio', 'ciencia'),('q2', 'Q', 'Producto lácteo para untar', 'Queso', 'facil', 'comida'),('q3', 'Q', 'Capital de Ecuador', 'Quito', 'medio', 'geografia'),('q4', 'Q', 'Número mínimo de miembros necesarios para sesionar', 'Quórum', 'dificil', 'derecho'),('q5', 'Q', 'Cítrico pequeño, ovalado y anaranjado, similar a la naranja,', 'Quinoto', 'dificil', 'gastronomía'),('q6', 'Q', 'Tortilla mexicana de queso', 'Quesadilla', 'medio', 'gastronomía'),('q7', 'Q', 'Personaje de un libro de Cervantes, oriundo de La Mancha', 'Quijote', 'dificil', 'general'),
 -- Letra R
-('R', 'Animal roedor pequeño', 'Ratón', 'facil', 'animales'),
-('R', 'Corriente de agua natural', 'Río', 'facil', 'naturaleza'),
-('R', 'Capital de Italia', 'Roma', 'medio', 'geografia'),
-('R', 'Energía que se propaga en forma de ondas o partículas', 'Radiación', 'dificil', 'fisica'),
-
+('r1', 'R', 'Animal roedor pequeño', 'Ratón', 'facil', 'animales'),('r2', 'R', 'Corriente de agua natural', 'Río', 'facil', 'naturaleza'),('r3', 'R', 'Capital de Italia', 'Roma', 'medio', 'geografia'),('r4', 'R', 'Energía que se propaga en forma de ondas o partículas', 'Radiación', 'dificil', 'fisica'),
 -- Letra S
-('S', 'Astro que da luz y calor', 'Sol', 'facil', 'astronomia'),
-('S', 'Reptil que reptan sin patas', 'Serpiente', 'facil', 'animales'),
-('S', 'Servicio de música en streaming', 'Spotify', 'facil', 'tecnologia'),
-('S', 'Conexión funcional entre neuronas para transmitir señales', 'Sinapsis', 'dificil', 'biologia'),
-
+('s1', 'S', 'Astro que da luz y calor', 'Sol', 'facil', 'astronomia'),('s2', 'S', 'Reptil que reptan sin patas', 'Serpiente', 'facil', 'animales'),('s3', 'S', 'Servicio de música en streaming', 'Spotify', 'facil', 'tecnologia'),('s4', 'S', 'Conexión funcional entre neuronas para transmitir señales', 'Sinapsis', 'dificil', 'biologia'),
 -- Letra T
-('T', 'Medio de transporte sobre rieles', 'Tren', 'facil', 'general'),
-('T', 'Capital de Japón', 'Tokio', 'medio', 'geografia'),
-('T', 'Animal felino con rayas', 'Tigre', 'facil', 'animales'),
-('T', 'Instrumento que mide la temperatura', 'Termómetro', 'dificil', 'instrumentos'),
-
+('t1', 'T', 'Medio de transporte sobre rieles', 'Tren', 'facil', 'general'),('t2', 'T', 'Capital de Japón', 'Tokio', 'medio', 'geografia'),('t3', 'T', 'Animal felino con rayas', 'Tigre', 'facil', 'animales'),('t4', 'T', 'Instrumento que mide la temperatura', 'Termómetro', 'dificil', 'instrumentos'),
 -- Letra U
-('U', 'Vestimenta igual para todos en un grupo', 'Uniforme', 'facil', 'vestimenta'),
-('U', 'Fruta morada en racimos', 'Uva', 'facil', 'comida'),
-('U', 'Servicio de transporte por aplicación', 'Uber', 'facil', 'tecnologia'),
-('U', 'Tipo de radiación electromagnética más energética que la luz violeta', 'Ultravioleta', 'dificil', 'fisica'),
-
+('u1', 'U', 'Vestimenta igual para todos en un grupo', 'Uniforme', 'facil', 'vestimenta'),('u2', 'U', 'Fruta morada en racimos', 'Uva', 'facil', 'comida'),('u3', 'U', 'Servicio de transporte por aplicación', 'Uber', 'facil', 'tecnologia'),('u4', 'U', 'Tipo de radiación electromagnética más energética que la luz violeta', 'Ultravioleta', 'dificil', 'fisica'),
 -- Letra V
-('V', 'Animal que da leche', 'Vaca', 'facil', 'animales'),
-('V', 'Bebida alcohólica hecha de uvas', 'Vino', 'facil', 'comida'),
-('V', 'Deporte de pelota con red alta', 'Voleibol', 'medio', 'deportes'),
-('V', 'Sustancia que estimula defensas para prevenir enfermedades', 'Vacuna', 'dificil', 'medicina'),
-
+('v1', 'V', 'Animal que da leche', 'Vaca', 'facil', 'animales'),('v2', 'V', 'Bebida alcohólica hecha de uvas', 'Vino', 'facil', 'comida'),('v3', 'V', 'Deporte de pelota con red alta', 'Voleibol', 'medio', 'deportes'),('v4', 'V', 'Sustancia que estimula defensas para prevenir enfermedades', 'Vacuna', 'dificil', 'medicina'),
 -- Letra W
-('W', 'Bebida alcohólica destilada de cereales', 'Whisky', 'medio', 'bebidas'),
-('W', 'Red informática mundial', 'Web', 'facil', 'tecnologia'),
-('W', 'Aplicación de mensajería para teléfonos', 'WhatsApp', 'facil', 'tecnologia'),
-('W', 'Tecnología que permite conexión inalámbrica a internet', 'Wifi', 'dificil', 'tecnologia'),
-
+('w1', 'W', 'Bebida alcohólica destilada de cereales', 'Whisky', 'medio', 'bebidas'),('w2', 'W', 'Red informática mundial', 'Web', 'facil', 'tecnologia'),('w3', 'W', 'Aplicación de mensajería para teléfonos', 'WhatsApp', 'facil', 'tecnologia'),('w4', 'W', 'Tecnología que permite conexión inalámbrica a internet', 'Wifi', 'dificil', 'tecnologia'),('w5', 'W', 'Deporte acuático con pelota en equipo', 'Waterpolo', 'medio', 'deporte'),('w6', 'W', 'Dispositivo portátil para reproducir cintas de casete.', 'Walkman', 'dificil', 'general'),('w7', 'W', 'Sistema operativo de Microsoft', 'Windows', 'medio', 'tecnología'),
 -- Letra X
-('X', 'Instrumento musical de percusión', 'Xilófono', 'medio', 'musica'),
-('X', 'Consola de videojuegos de Microsoft', 'Xbox', 'medio', 'tecnologia'),
-('X', 'Elemento químico noble usado en lámparas y flashes', 'Xenón', 'dificil', 'quimica'),
-
+('x1', 'X', 'Instrumento musical de percusión', 'Xilófono', 'medio', 'musica'),('x2', 'X', 'Consola de videojuegos de Microsoft', 'Xbox', 'medio', 'tecnologia'),('x3', 'X', 'Elemento químico noble usado en lámparas y flashes', 'Xenón', 'dificil', 'quimica'),('x4', 'X', 'Adaptación de los organismos a ambientes secos', 'Xerofilia', 'dificil', 'biologia'),
 -- Letra Y
-('Y', 'Plataforma de videos en línea más utilizada', 'YouTube', 'facil', 'tecnologia'),
-('Y', 'Embarcación de recreo', 'Yate', 'medio', 'nautica'),
-('Y', 'Parte central del huevo', 'Yema', 'medio', 'comida'),
-('Y', 'Elemento químico usado como antiséptico y en la tiroides', 'Yodo', 'dificil', 'quimica'),
-
+('y1', 'Y', 'Plataforma de videos en línea más utilizada', 'YouTube', 'facil', 'tecnologia'),('y2', 'Y', 'Embarcación de recreo', 'Yate', 'medio', 'nautica'),('y3', 'Y', 'Parte central del huevo', 'Yema', 'medio', 'comida'),('y4', 'Y', 'Elemento químico usado como antiséptico y en la tiroides', 'Yodo', 'dificil', 'quimica'),('y5', 'Y', 'Lugar donde se extraen minerales o recursos naturales', 'Yacimientos', 'medio', 'geologia'),
 -- Letra Z
-('Z', 'Plataforma de videollamadas muy usada en pandemia', 'Zoom', 'facil', 'tecnologia'),
-('Z', 'Calzado que cubre el pie', 'Zapato', 'facil', 'vestimenta'),
-('Z', 'Lugar donde se exhiben animales', 'Zoológico', 'medio', 'lugares'),
-('Z', 'Rama de la biología que estudia a los animales', 'Zoología', 'dificil', 'biologia');
+('z1', 'Z', 'Plataforma de videollamadas muy usada en pandemia', 'Zoom', 'facil', 'tecnologia'),('z2', 'Z', 'Calzado que cubre el pie', 'Zapato', 'facil', 'vestimenta'),('z3', 'Z', 'Lugar donde se exhiben animales', 'Zoológico', 'medio', 'lugares'),('z4', 'Z', 'Rama de la biología que estudia a los animales', 'Zoología', 'dificil', 'biologia'),('z5', 'Z', 'Animal mamífero carnívoro de hocico alargado y cola poblada', 'Zorro', 'facil', 'animales');
